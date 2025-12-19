@@ -115,7 +115,28 @@ Làm sao để tin tưởng khóa công khai $e, n$ là thật?
     - RSA quá chậm để mã hóa file lớn.
     - **Thực tế:** Dùng RSA để trao đổi một **Khóa phiên (Session Key)** $\rightarrow$ Dùng Khóa phiên (AES/DES) để mã hóa dữ liệu tốc độ cao.
 
----
+### **KIẾN THỨC CẦN CÓ ĐỂ LÀM ĐƯỢC CÂU NÀY**
+
+Để chọn chính xác đáp án C và loại trừ các đáp án còn lại, bạn cần nắm vững 3 mảng kiến thức sau được trình bày trong Chương 3:
+
+**1. Hiểu rõ hạn chế (Khuyết điểm) của Mã hóa đối xứng**
+Bạn cần biết tại sao mã hóa đối xứng (như DES, AES học ở chương 2) lại gặp khó khăn trong môi trường mạng lớn:
+
+- **Vấn đề phân phối khóa:** Mã hóa đối xứng yêu cầu hai bên phải có cùng một khóa bí mật. Nếu gửi khóa này qua mạng không an toàn, nó có thể bị đánh cắp, làm tổn thương toàn bộ thông tin liên lạc.
+- **Thiếu khả năng xác thực/chống thoái thác:** Hệ mã đối xứng xem hai bên là như nhau (cùng giữ 1 khóa), nên không thể bảo vệ bên nhận khỏi việc bên gửi chối bỏ trách nhiệm hoặc giả mạo thông điệp.
+
+**2. Mục đích ra đời của Mã hóa khóa công khai**
+Bạn cần nhớ sự kiện lịch sử và mục tiêu thiết kế của hệ mã này:
+
+- Vào năm 1976, Whitfield Diffie và Martin Hellman đã trình bày phát minh này tại Đại học Stanford.
+- Mục tiêu cốt lõi: Giải quyết bài toán **Phân phối khóa** và cung cấp khả năng **Chữ ký số**. Đây chính là chìa khóa để chọn đáp án C.
+
+**3. Đặc điểm kỹ thuật và so sánh hiệu năng**
+Bạn cần phân biệt được sự khác nhau về tốc độ và cách dùng giữa hai loại mã hóa để loại trừ đáp án A, B và D:
+
+- **Tốc độ:** Mã hóa công khai chậm hơn vì dựa trên các phép toán số học phức tạp (như lũy thừa, logarit rời rạc).
+- **Quan hệ:** Nó sinh ra để bổ sung cho mã hóa đối xứng (dùng mã hóa công khai để trao đổi khóa, sau đó dùng khóa đó để mã hóa dữ liệu tốc độ cao), chứ không phải để thay thế.
+- **Kích thước khóa:** Khóa công khai thường dài (512-4096 bits), trong khi khóa đối xứng thường ngắn hơn (ví dụ DES 56 bits, AES 128-256 bits).
 
 ### **TỔNG KẾT: CÁC LỖI "CHẾT NGƯỜI" CẦN TRÁNH KHI THI**
 

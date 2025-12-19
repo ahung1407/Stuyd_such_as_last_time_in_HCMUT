@@ -36,8 +36,35 @@ Dưới đây là bản **tổng hợp cốt lõi và trọng tâm nhất** (Che
 2.  **ShiftRows:** Dịch hàng $\rightarrow$ Tạo tính **Diffusion**.
 3.  **MixColumns:** Trộn cột (nhân ma trận trong $GF(2^8)$) $\rightarrow$ Tạo tính **Diffusion**.
 4.  **AddRoundKey:** Cộng khóa (XOR) $\rightarrow$ Bước duy nhất dùng khóa.
+    Dựa trên tài liệu bạn cung cấp, trình tự thực hiện cốt lõi của Triple-DES (3DES) là **Mã hóa - Giải mã - Mã hóa** (viết tắt là **E-D-E**).
 
----
+Cụ thể, quy trình này vận hành theo hai trường hợp sử dụng khóa như sau:
+
+**1. Triple-DES với 2 khóa (K1 và K2)**
+Đây là cấu hình phổ biến (được chuẩn hóa trong ANSI X9.17 & ISO8732). Trình tự thực hiện là:
+
+1.  **Mã hóa** bản rõ bằng khóa **K1**.
+2.  **Giải mã** kết quả vừa có bằng khóa **K2**.
+3.  **Mã hóa** kết quả đó một lần nữa bằng khóa **K1**.
+
+- Công thức: $C = E_{K1}(D_{K2}(E_{K1}(P)))$.
+
+**2. Triple-DES với 3 khóa (K1, K2 và K3)**
+Để tăng cường bảo mật cao hơn (tránh một số tấn công lý thuyết), người ta dùng 3 khóa riêng biệt nhưng vẫn giữ nguyên trình tự E-D-E:
+
+1.  **Mã hóa** bản rõ bằng khóa **K1**.
+2.  **Giải mã** kết quả bằng khóa **K2**.
+3.  **Mã hóa** kết quả bằng khóa **K3**.
+
+- Công thức: $C = E_{K3}(D_{K2}(E_{K1}(P)))$.
+
+**Tại sao bước ở giữa lại là Giải mã (Decrypt) thay vì Mã hóa?**
+Mặc dù việc giải mã bằng một khóa _sai_ (K2 khác K1) thực chất chỉ làm dữ liệu rối tung thêm (tương đương với việc mã hóa về mặt an toàn), nhưng mục đích chính của thiết kế E-D-E là để đảm bảo **tương thích ngược**:
+
+- Nếu ta gán **K1 = K2**, bước giải mã thứ hai sẽ hủy bỏ bước mã hóa thứ nhất ($D_{K1}(E_{K1}(P)) = P$).
+- Khi đó, toàn bộ quy trình chỉ còn lại một lần mã hóa cuối cùng ($E_{K1}$), giúp hệ thống Triple-DES hoạt động y hệt như chuẩn DES đơn (Single DES) cũ.
+
+## **Tóm lại để làm trắc nghiệm:** Hãy nhớ kỹ từ khóa **E-D-E** (Encrypt - Decrypt - Encrypt). Nếu đề bài hỏi về trường hợp K1=K2, đáp án là nó trở về DES thông thường.
 
 ### 3. Toán học nền tảng (Cơ sở của AES)
 
@@ -58,6 +85,91 @@ Dùng để mã hóa dữ liệu lớn hơn 1 khối (file, video, stream).
 | **CBC** (Cipher Block Chaining) | $C_i = E(P_i \oplus C_{i-1})$. Dùng IV. | An toàn, phổ biến.                                   | Phải mã hóa **tuần tự** (chậm), lỗi lan truyền.                                 |
 | **CTR** (Counter)               | Mã hóa bộ đếm, rồi XOR với bản rõ.      | **Nhanh nhất** (Song song hóa), truy cập ngẫu nhiên. | **Cấm dùng lại** cặp (Key, Counter) (chết người).                               |
 | **CFB / OFB**                   | Giả lập mã dòng (Stream cipher).        | Tốt cho truyền bit lẻ (telnet), đường truyền nhiễu.  | Ít dùng hơn CTR ngày nay.                                                       |
+
+Dựa trên tài liệu bạn cung cấp (đặc biệt là các trang từ đến trong "C2.pdf"), dưới đây là nội dung chi tiết về **5 chế độ hoạt động (Modes of Operation)** của mã hóa khối mà bạn cần nắm chắc.
+
+Các chế độ này được sinh ra vì thuật toán mã hóa khối (như DES, AES) chỉ xử lý các khối dữ liệu cố định (ví dụ 64 bit hoặc 128 bit). Để mã hóa một lượng dữ liệu tùy ý trong thực tế, ta cần các chế độ này.
+
+Trước khi đi vào từng chế độ, bạn cần biết về **Padding (Thêm vào thông điệp):** Nếu dữ liệu không đủ kích thước khối, hệ thống phải thêm vào các byte (byte 0, byte khoảng trắng, hoặc byte chỉ số lượng thêm vào theo chuẩn PKCS) để lấp đầy khối cuối cùng.
+
+---
+
+### 1. Electronic Code Book (ECB) - Quyển mã điện tử
+
+Đây là chế độ cơ bản nhất.
+
+- **Cơ chế:** Thông điệp được chia thành các khối độc lập. Mỗi khối được mã hóa riêng biệt với cùng một khóa ($C_i = E_K(P_i)$).
+- **Ưu điểm:**
+  - Đơn giản.
+  - Có thể xử lý **song song** (mã hóa/giải mã nhiều khối cùng lúc).
+- **Nhược điểm (Rất quan trọng):**
+  - **Yếu:** Các khối bản rõ giống nhau sẽ tạo ra các khối bản mã giống hệt nhau.
+  - Dễ bị phân tích mẫu (pattern), ví dụ như khi mã hóa dữ liệu đồ họa/hình ảnh, người ta vẫn có thể nhìn thấy hình dáng của ảnh gốc.
+- **Ứng dụng:** Chỉ dùng khi có rất ít khối cần gửi.
+
+### 2. Cipher Block Chaining (CBC) - Mã hóa khối liên kết
+
+Đây là chế độ phổ biến để khắc phục điểm yếu của ECB.
+
+- **Cơ chế:** Các khối được móc xích với nhau. Trước khi mã hóa, khối bản rõ hiện tại được **XOR** với khối bản mã trước đó ($C_i = E_K(P_i \oplus C_{i-1})$). Khối đầu tiên cần một **Vector khởi tạo (IV - Initial Vector)**.
+- **Ưu điểm:**
+  - Bảo mật tốt hơn ECB: Bất kỳ thay đổi nhỏ nào trên một khối bản rõ sẽ ảnh hưởng lan truyền đến tất cả các khối mã sau đó.
+  - Thích hợp mã hóa dữ liệu lớn.
+- **Nhược điểm:**
+  - Cần quản lý IV: IV phải được biết bởi cả hai bên. Nếu IV gửi dạng bản rõ, kẻ tấn công có thể sửa đổi nó. IV nên được cố định hoặc gửi kèm dưới dạng đã mã hóa.
+  - Không thể mã hóa song song (vì khối sau phải chờ kết quả khối trước).
+
+### 3. Cipher FeedBack (CFB) - Phản hồi mã
+
+Chế độ này biến mã hóa khối thành **mã hóa dòng (stream cipher)**.
+
+- **Cơ chế:** Xem thông điệp như một dòng các bit. Đầu ra của khối mã hóa trước đó được đưa quay lại (feedback) làm đầu vào cho khối tiếp theo. Kết quả mã hóa được XOR với bản rõ để tạo ra bản mã.
+- **Ưu điểm:**
+  - Thích hợp cho dữ liệu dạng dòng bit/byte (stream).
+  - Là chế độ phổ biến nhất của mã hóa dòng.
+- **Nhược điểm:**
+  - **Lỗi lan truyền:** Nếu xảy ra lỗi trên đường truyền, nó sẽ lan truyền và làm sai lệch nhiều khối sau đó.
+  - Cần đường truyền tin cậy.
+
+### 4. Output FeedBack (OFB) - Phản hồi đầu ra
+
+Tương tự CFB nhưng cơ chế phản hồi khác biệt để tránh lan truyền lỗi.
+
+- **Cơ chế:** Đầu ra của hàm mã hóa (Output) được đưa quay lại làm đầu vào cho bước tiếp theo (độc lập với bản rõ/bản mã). Dòng khóa (keystream) này sau đó mới XOR với bản rõ,.
+- **Ưu điểm:**
+  - **Không lan truyền lỗi:** Lỗi trên một bit truyền đi chỉ ảnh hưởng đến bit đó khi giải mã, không làm hỏng các bit sau.
+- **Nhược điểm:**
+  - Dễ bị tổn thương nếu kẻ tấn công thay đổi dòng thông điệp (modification attack).
+  - Nên sử dụng phản hồi đầy đủ (Full feedback OFB-64/128) để an toàn hơn.
+
+### 5. Counter (CTR) - Bộ đếm
+
+Đây là chế độ hiện đại, được xem là chuẩn khi dùng với AES.
+
+- **Cơ chế:** Là một phiên bản của OFB, nhưng thay vì phản hồi đầu ra, nó mã hóa một giá trị **Bộ đếm (Counter)**. Giá trị Counter + Khóa sẽ được mã hóa để tạo ra dòng khóa, sau đó XOR với bản rõ.
+- **Ưu điểm vượt trội:**
+  - **Hiệu quả cao:** Có thể thực hiện mã hóa **song song** (cả phần cứng và phần mềm) vì các counter độc lập nhau.
+  - Truy cập ngẫu nhiên: Có thể giải mã một khối bất kỳ mà không cần giải mã các khối trước.
+  - Thích hợp cho mạng tốc độ cao,.
+- **Nhược điểm (Cực kỳ quan trọng):**
+  - Tuyệt đối **không tái sử dụng** cặp (Khóa, Counter). Nếu dùng lại, hệ thống sẽ bị bẻ gãy.
+
+---
+
+### Tóm tắt so sánh để dễ nhớ:
+
+1.  **ECB:** Đơn giản, nhanh, nhưng lộ mẫu (không an toàn cho dữ liệu lớn).
+2.  **CBC:** An toàn, phổ biến, cần IV, lỗi lan truyền.
+3.  **CFB:** Biến mã khối thành mã dòng, lỗi lan truyền.
+4.  **OFB:** Mã dòng, lỗi **không** lan truyền.
+5.  **CTR:** Mã dòng (dựa trên bộ đếm), hỗ trợ **xử lý song song**, nhanh nhất, cấm dùng lại Counter.
+
+**Gợi ý hình tượng (Analogy):**
+Hãy tưởng tượng việc mã hóa giống như việc dịch một cuốn sách:
+
+- **ECB:** Dịch từng trang độc lập. Nếu trang 10 và trang 20 có nội dung giống hệt nhau, bản dịch cũng giống hệt nhau -> Lộ thông tin.
+- **CBC:** Nội dung bản dịch trang 2 phụ thuộc vào trang 1. Phải dịch xong trang 1 mới dịch được trang 2. Rất chặt chẽ nhưng chậm hơn.
+- **CTR:** Bạn có một máy tạo ra dòng chữ ngẫu nhiên (dựa trên số trang). Bạn chỉ cần lấy trang sách gốc "trộn" với dòng chữ ngẫu nhiên đó. Vì số trang đã biết trước, bạn có thể thuê 10 người dịch 10 trang cùng lúc (Song song).
 
 ---
 
