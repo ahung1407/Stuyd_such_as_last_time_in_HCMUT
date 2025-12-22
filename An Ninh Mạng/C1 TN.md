@@ -1,123 +1,259 @@
-Chào bạn, đây là bộ câu hỏi trắc nghiệm được biên soạn chi tiết dựa trên nội dung Chương 1 từ tài liệu "C1.pdf" bạn cung cấp, bao gồm các dạng câu hỏi bạn yêu cầu để nắm vững kiến thức.
+Để "master" hoàn toàn chương này, dựa trên độ dài và độ phức tạp của 74 slide, bạn cần khoảng **25-30 câu hỏi** chất lượng cao. Số lượng này đủ để bao phủ mọi khía cạnh: từ định nghĩa cơ bản (CIA), mô hình chuẩn (OSI), phân loại tấn công, cho đến các chiến lược phòng thủ và cạm bẫy từ ngữ.
 
-### Dạng 1: Hiểu & Áp dụng
+Dưới đây là bộ 30 câu hỏi được thiết kế riêng cho mục đích này.
 
-**1. Một quản trị viên hệ thống thiết lập hệ thống sao lưu (backup) dữ liệu định kỳ hàng ngày để đảm bảo rằng nếu hệ thống bị tấn công xóa dữ liệu, họ có thể khôi phục lại được. Hành động này thuộc về loại biện pháp đối phó nào?**
-A. Phòng ngừa (Prevention)
-B. Phát hiện (Detection)
-C. Phục hồi (Recovery)
-D. Tấn công (Attack)
-đáp án: C
-Giải thích: C đúng vì theo tài liệu, Phục hồi tập trung vào việc khôi phục hệ thống sau tấn công, ví dụ như giải pháp sao lưu và phục hồi dữ liệu; A sai vì Phòng ngừa tập trung vào ngăn chặn vi phạm (ví dụ tường lửa); B sai vì Phát hiện tập trung vào tìm ra vi phạm càng nhanh càng tốt (ví dụ IDS); D sai vì Tấn công là hành động vi phạm chứ không phải biện pháp đối phó.
+---
 
-**2. Tin tặc bắt được gói tin chuyển tiền từ A sang B, thay đổi số tiền từ 10$ thành 1000$ rồi gửi tiếp cho ngân hàng. Đây là loại tấn công nào và vi phạm nguyên tắc gì?**
-A. Tấn công thụ động - Vi phạm tính Bí mật
-B. Tấn công chủ động - Vi phạm tính Toàn vẹn
-C. Tấn công thụ động - Vi phạm tính Sẵn sàng
-D. Tấn công chủ động - Vi phạm tính Bí mật
-đáp án: B
-Giải thích: B đúng vì đây là hành động thay đổi nội dung thông điệp thuộc tấn công chủ động và vi phạm tính Toàn vẹn (bảo vệ thông tin khỏi sự sửa đổi trái phép); A sai vì tấn công thụ động chỉ nghe lén hoặc phân tích lưu lượng chứ không sửa đổi dữ liệu; C sai vì tính Sẵn sàng liên quan đến khả năng truy cập dịch vụ; D sai vì mặc dù có thể vi phạm bí mật nhưng tính chất chính của việc "sửa đổi" là vi phạm tính Toàn vẹn.
+### Phần 1: Dạng câu hỏi "Hiểu & Áp dụng" (Kiểm tra kiến thức nền tảng và tình huống thực tế)
 
-**3. Theo mô hình phát hiện xâm nhập (IDS), nếu hệ thống so sánh lưu lượng mạng hiện tại với một hồ sơ lưu lượng chuẩn (baseline) đã được thiết lập trước đó để tìm sự thay đổi đột ngột, thì đây là kỹ thuật gì?**
-A. Phát hiện dựa trên mẫu (Signature-based)
-B. Kiểm tra gói tin sâu (Deep Packet Inspection)
-C. Phát hiện dựa trên bất thường (Anomaly-based)
-D. Tường lửa UTM (Unified Threat Management)
-đáp án: C
-Giải thích: C đúng vì phát hiện dựa trên bất thường tạo một hồ sơ lưu lượng chuẩn và tìm ra sự bất thường khi lưu lượng thay đổi đột ngột; A sai vì phát hiện dựa trên mẫu so sánh gói tin với cơ sở dữ liệu các mẫu tấn công đã biết; B sai vì kiểm tra gói tin sâu là xem xét nội dung cụ thể trong gói tin; D sai vì UTM là giải pháp tường lửa hợp nhất nhiều chức năng chứ không phải tên riêng của kỹ thuật này.
-
-### Dạng 2: Tổng hợp & Liên kết
-
-**4. Dữ liệu của một công ty bị mã độc tống tiền (Ransomware) mã hóa khiến nhân viên không thể mở được file để làm việc. Theo phần thảo luận và định nghĩa, nguyên tắc an toàn thông tin nào đã bị vi phạm nghiêm trọng nhất trong tình huống này?**
+**1. Một hacker thực hiện tấn công làm tràn bộ đệm khiến máy chủ web của công ty bị treo và khách hàng không thể truy cập được. Hành động này vi phạm nguyên tắc nào trong tam giác bảo mật CIA?**
 A. Tính Bí mật (Confidentiality)
 B. Tính Toàn vẹn (Integrity)
 C. Tính Sẵn sàng (Availability)
-D. Tính Chống thoái thác (Non-repudiation)
+D. Tính Xác thực (Authentication)
 đáp án: C
-Giải thích: C đúng vì mục tiêu của tính Sẵn sàng là đảm bảo dữ liệu có thể truy cập được bởi người dùng có quyền khi cần, Ransomware ngăn chặn việc truy cập này,; A sai vì Ransomware thường không nhất thiết tiết lộ thông tin ra ngoài (dù có thể đi kèm); B sai vì mặc dù dữ liệu bị thay đổi (mã hóa) nhưng mục đích chính là ngăn cản truy cập (Availability); D sai vì Chống thoái thác liên quan đến việc phủ nhận giao dịch.
+Giải thích: C đúng vì tính Sẵn sàng đảm bảo hệ thống hoạt động khi người dùng cần, tấn công làm treo máy chủ (DoS) vi phạm trực tiếp tính chất này; A sai vì hacker không đánh cắp dữ liệu; B sai vì hacker không sửa đổi dữ liệu; D sai vì đây không phải là vấn đề giả mạo danh tính.
 
-**5. Mối quan hệ giữa "Tấn công thụ động" và các biện pháp ứng phó được mô tả như thế nào là chính xác nhất theo tài liệu?**
-A. Dễ phát hiện nhưng khó ngăn chặn, cần tập trung vào phục hồi.
-B. Rất khó phát hiện, cần tập trung vào biện pháp ngăn chặn.
-C. Dễ phát hiện và dễ ngăn chặn bằng tường lửa.
-D. Không thể ngăn chặn, chỉ có thể chấp nhận rủi ro.
+**2. Công ty A quy định: "Tất cả nhân viên Kế toán chỉ được xem bảng lương của mình, nhưng Trưởng phòng Kế toán được xem bảng lương của toàn công ty". Đây là ví dụ về khái niệm nào?**
+A. Xác thực (Authentication)
+B. Cấp quyền (Authorization)
+C. Chống thoái thác (Non-repudiation)
+D. Kế toán (Accounting)
 đáp án: B
-Giải thích: B đúng vì tấn công thụ động rất khó phát hiện do không thay đổi dữ liệu, nên biện pháp chính là ngăn chặn (ví dụ mã hóa),; A sai vì mô tả này phù hợp với tấn công chủ động (khó ngăn chặn tuyệt đối, cần phát hiện và phục hồi); C sai vì tấn công thụ động (như nghe lén) rất khó phát hiện; D sai vì có thể ngăn chặn bằng an ninh truyền thông.
+Giải thích: B đúng vì Cấp quyền là quá trình xác định người dùng được phép làm gì/truy cập tài nguyên nào sau khi đã đăng nhập; A sai vì Xác thực chỉ là bước chứng minh danh tính (đăng nhập); C sai vì Chống thoái thác liên quan đến bằng chứng giao dịch; D sai vì Accounting liên quan đến ghi nhật ký hoạt động.
 
-**6. Để đảm bảo nguyên tắc "Chống thoái thác" (Non-repudiation) trong giao dịch điện tử, cơ chế an ninh cụ thể nào thường được sử dụng nhất?**
-A. Mã hóa (Encryption)
+**3. Khi bạn gửi một email quan trọng, bạn muốn đảm bảo rằng người nhận biết chắc chắn email đó do chính bạn gửi chứ không phải ai khác giả mạo. Dịch vụ an ninh nào giải quyết vấn đề này?**
+A. Bí mật dữ liệu
+B. Toàn vẹn dữ liệu
+C. Chống thoái thác về nguồn gốc
+D. Kiểm soát truy cập
+đáp án: C
+Giải thích: C đúng vì Chống thoái thác về nguồn gốc chứng minh danh tính người gửi, khiến họ không thể phủ nhận việc đã gửi tin; A sai vì nó chỉ giấu nội dung; B sai vì nó chỉ đảm bảo tin không bị sửa; D sai vì nó là việc chặn/cho phép truy cập tài nguyên.
+
+**4. Kỹ thuật "Traffic Padding" (Chèn lưu lượng giả) được sử dụng chủ yếu để đối phó với loại tấn công nào?**
+A. Tấn công từ chối dịch vụ (DoS)
+B. Phân tích lưu lượng (Traffic Analysis)
+C. Nghe lén nội dung (Release of message contents)
+D. Giả mạo (Masquerade)
+đáp án: B
+Giải thích: B đúng vì Phân tích lưu lượng dựa vào việc quan sát tần suất và kích thước gói tin, chèn dữ liệu giả làm nhiễu loạn quy luật này; A sai vì chèn thêm traffic có thể làm mạng chậm hơn chứ không chống DoS; C sai vì chống nghe lén nội dung cần dùng mã hóa; D sai vì chống giả mạo cần xác thực.
+
+**5. Trong mô hình khối lập phương McCumber về an toàn thông tin, ba trạng thái của thông tin cần được bảo vệ là gì?**
+A. Phần cứng, Phần mềm, Dữ liệu
+B. Con người, Chính sách, Công nghệ
+C. Lưu trữ, Truyền tải, Xử lý
+D. Bí mật, Toàn vẹn, Sẵn sàng
+đáp án: C
+Giải thích: C đúng vì theo slide 15, ba trạng thái thông tin là Lưu trữ (Storage), Truyền tải (Transmission) và Xử lý (Processing); A là các thành phần hệ thống; B là các biện pháp đối phó; D là các thuộc tính an toàn (CIA).
+
+**6. Một nhân viên y tế vô tình nhập sai nhóm máu của bệnh nhân vào hồ sơ điện tử. Mặc dù không cố ý, hành động này đã vi phạm thuộc tính nào?**
+A. Tính Bí mật
+B. Tính Sẵn sàng
+C. Tính Toàn vẹn
+D. Tính Riêng tư
+đáp án: C
+Giải thích: C đúng vì tính Toàn vẹn bị vi phạm khi dữ liệu bị thay đổi sai lệch so với thực tế, bất kể là do cố ý hay vô tình; A sai vì dữ liệu không bị lộ ra ngoài; B sai vì dữ liệu vẫn truy cập được; D sai vì không liên quan đến lộ thông tin cá nhân ra công chúng.
+
+**7. Hệ thống IDS (Phát hiện xâm nhập) loại nào có khả năng phát hiện các cuộc tấn công Zero-day (mã độc chưa từng biết đến) tốt nhất?**
+A. IDS dựa trên chữ ký (Signature-based)
+B. IDS dựa trên sự bất thường (Anomaly-based)
+C. Tường lửa lọc gói tin (Packet filtering)
+D. Phần mềm diệt virus truyền thống
+đáp án: B
+Giải thích: B đúng vì nó học hành vi bình thường của hệ thống và cảnh báo khi có hành vi lạ, do đó phát hiện được cái mới; A và D sai vì chúng dựa vào cơ sở dữ liệu mẫu đã biết nên "mù" với Zero-day; C sai vì tường lửa chỉ lọc dựa trên luật IP/Port chứ không phân tích hành vi sâu.
+
+---
+
+### Phần 2: Dạng câu hỏi "Tổng hợp & Liên kết" (Kết nối kiến thức chuẩn X.800 và các mô hình)
+
+**8. Theo bảng quan hệ giữa Cơ chế và Dịch vụ trong chuẩn X.800 (Slide 58), để đạt được dịch vụ "Bí mật dòng thông tin" (Traffic flow confidentiality), cơ chế nào sau đây là bắt buộc phải có?**
+A. Chữ ký số
+B. Điều khiển định tuyến
+C. Mã hóa
+D. Công chứng
+đáp án: C
+Giải thích: C đúng vì để giấu thông tin dòng lưu lượng thì việc mã hóa (Encipherment) là cơ chế nền tảng (cùng với Traffic Padding); A dùng cho xác thực/toàn vẹn; B dùng để chọn đường đi an toàn; D dùng cho chống thoái thác.
+
+**9. Mối quan hệ giữa "Chính sách", "Tiêu chuẩn" và "Thủ tục" được mô tả đúng nhất như thế nào?**
+A. Chính sách chi tiết nhất, Thủ tục tổng quát nhất.
+B. Tiêu chuẩn là bắt buộc, Hướng dẫn là tự nguyện, Chính sách là tổng quát.
+C. Thủ tục định nghĩa "cái gì", Chính sách định nghĩa "làm thế nào".
+D. Chính sách không bắt buộc tuân thủ, Tiêu chuẩn bắt buộc tuân thủ.
+đáp án: B
+Giải thích: B đúng vì Chính sách là tuyên bố cấp cao, Tiêu chuẩn đưa ra thông số bắt buộc, Hướng dẫn là gợi ý; A sai vì ngược lại; C sai vì Chính sách là "cái gì/tại sao", Thủ tục là "làm thế nào"; D sai vì Chính sách luôn bắt buộc.
+
+**10. Chiến lược "Phòng vệ theo chiều sâu" (Defense in Depth) khắc phục điểm yếu nào của chiến lược "Bảo vệ vòng ngoài" (Perimeter Defense)?**
+A. Khắc phục việc tốn kém chi phí phần cứng.
+B. Khắc phục nguy cơ từ tấn công nội bộ và việc tường lửa bị vượt qua.
+C. Khắc phục tốc độ mạng bị chậm.
+D. Khắc phục việc khó quản lý nhân sự.
+đáp án: B
+Giải thích: B đúng vì bảo vệ vòng ngoài chỉ cứng bên ngoài nhưng rỗng bên trong, nếu hacker vượt qua tường lửa hoặc là nhân viên nội bộ thì hệ thống vô phương cứu chữa, Defense in Depth bảo vệ từng lớp một; A, C, D không phải là mục tiêu kỹ thuật chính của chiến lược này.
+
+**11. Tấn công "Replay" (Phát lại) vi phạm chủ yếu tính chất nào và có thể bị ngăn chặn bởi dịch vụ nào?**
+A. Vi phạm Tính Bí mật - Ngăn chặn bằng Mã hóa.
+B. Vi phạm Tính Sẵn sàng - Ngăn chặn bằng Tường lửa.
+C. Vi phạm Tính Toàn vẹn/Xác thực - Ngăn chặn bằng Xác thực thực thể ngang hàng.
+D. Vi phạm Tính Riêng tư - Ngăn chặn bằng Kiểm soát truy cập.
+đáp án: C
+Giải thích: C đúng vì Replay là việc gửi lại gói tin cũ để giả mạo phiên làm việc, vi phạm tính xác thực của phiên, cần dịch vụ Xác thực (Authentication exchange) với số thứ tự hoặc timestamp để chống lại; A sai vì Replay không cần đọc nội dung; B sai vì mục tiêu không phải là làm sập mạng; D không liên quan.
+
+**12. Theo thống kê của FBI (trong slide), tỷ lệ các cuộc tấn công nội bộ chiếm khoảng bao nhiêu phần trăm và tại sao nó nguy hiểm?**
+A. 20-40%, vì họ có kỹ năng cao.
+B. 60-80%, vì họ đã có quyền truy cập hợp lệ.
+C. 10-20%, vì họ ghét công ty.
+D. 90-100%, vì tường lửa không chặn được.
+đáp án: B
+Giải thích: B đúng theo số liệu Slide 36 và lý do họ nguy hiểm là vì họ nằm trong vùng tin cậy (trusted), có quyền (authorization) sẵn có; các đáp án khác sai về số liệu hoặc lý do.
+
+---
+
+### Phần 3: Dạng câu hỏi "Tìm điểm sai/ngoại lệ" (Loại trừ phương án không phù hợp)
+
+**13. Đâu KHÔNG phải là một hình thức tấn công chủ động?**
+A. Từ chối dịch vụ (DoS)
+B. Phân tích lưu lượng (Traffic Analysis)
+C. Giả mạo (Masquerade)
+D. Thay đổi thông điệp (Modification)
+đáp án: B
+Giải thích: B đúng là đáp án cần chọn vì Phân tích lưu lượng là tấn công Thụ động (chỉ quan sát, không can thiệp); A, C, D đều tác động trực tiếp vào hệ thống hoặc dữ liệu nên là tấn công Chủ động.
+
+**14. Cơ chế nào sau đây KHÔNG được liệt kê trong danh sách 8 cơ chế an ninh cụ thể của chuẩn X.800?**
+A. Mã hóa (Encipherment)
 B. Chữ ký số (Digital Signature)
-C. Kiểm soát truy cập (Access Control)
-D. Đệm dòng dữ liệu (Traffic Padding)
-đáp án: B
-Giải thích: B đúng vì chữ ký số cho phép người nhận chứng minh nguồn gốc và tính toàn vẹn, hỗ trợ dịch vụ chống thoái thác,; A sai vì mã hóa chủ yếu đảm bảo tính bí mật; C sai vì kiểm soát truy cập quản lý quyền hạn; D sai vì chèn thông tin (Padding) dùng để chống phân tích lưu lượng.
-
-### Dạng 3: Tìm điểm sai/ngoại lệ
-
-**7. Khi nói về "Bảo vệ vòng ngoài" (Perimeter Defense), nhận định nào sau đây là SAI?**
-A. Nó giống như một pháo đài được bao quanh bởi hào, ví dụ như sử dụng tường lửa.
-B. Nó bảo vệ hiệu quả chống lại tất cả các cuộc tấn công từ bên trong (Insider attacks).
-C. Nếu lớp vỏ bọc bên ngoài bị phá vỡ, các hệ thống bên trong sẽ hoàn toàn mở trước các cuộc tấn công.
-D. Nó là cách tiếp cận không hoàn toàn đầy đủ và nên kết hợp với phòng vệ theo chiều sâu.
-đáp án: B
-Giải thích: B đúng là điểm sai vì tài liệu khẳng định mô hình này không thực hiện biện pháp nào để bảo vệ các hệ thống bên trong đối với các tấn công nội bộ; A sai vì đây là mô tả đúng về bảo vệ vòng ngoài; C sai vì đây là điểm yếu đã được nêu của mô hình này; D sai vì tài liệu khuyến nghị cần có cái nhìn tổng quát hơn (như phòng vệ chiều sâu),.
-
-**8. Trong ví dụ về tiêu chuẩn mật khẩu được đề cập trong tài liệu, yêu cầu nào sau đây KHÔNG có trong danh sách?**
-A. Chiều dài tối thiểu là 8 ký tự.
-B. Phải bao gồm cả ký tự thường và ký tự hoa.
-C. Không được chứa tên đăng nhập của người dùng.
-D. Lịch sử mật khẩu của 4 lần sử dụng trước đó phải được lưu lại.
+C. Đào tạo nhận thức (Security Awareness Training)
+D. Chèn thông tin đệm (Traffic Padding)
 đáp án: C
-Giải thích: C đúng là ngoại lệ vì trong ví dụ về tiêu chuẩn mật khẩu tại mục không đề cập đến việc cấm chứa tên đăng nhập; A sai vì đây là yêu cầu đúng trong tài liệu; B sai vì đây là yêu cầu đúng trong tài liệu; D sai vì đây là yêu cầu đúng để tránh tái sử dụng mật khẩu.
+Giải thích: C đúng là đáp án cần chọn vì Đào tạo nhận thức là biện pháp quản lý/con người, không phải là cơ chế kỹ thuật nằm trong định nghĩa của kiến trúc OSI X.800 (Slide 47-50); A, B, D đều là cơ chế chuẩn.
 
-**9. Đối tượng nào sau đây thường KHÔNG được coi là nguồn gốc của các cuộc tấn công "Phi cấu trúc" (Unstructured threats)?**
-A. Các cá nhân thiếu kinh nghiệm.
-B. Người sử dụng các công cụ tấn công dễ dàng có sẵn.
-C. Tin tặc có động lực tài chính và kỹ năng kỹ thuật tinh vi phát triển mã độc riêng.
-D. Người thực hiện tấn công với mục đích thử nghiệm kỹ năng.
+**15. Phát biểu nào sau đây về Tường lửa (Firewall) là SAI?**
+A. Tường lửa có thể ngăn chặn hoàn toàn các cuộc tấn công từ bên trong mạng nội bộ.
+B. Tường lửa giúp cách ly mạng nội bộ với mạng Internet không an toàn.
+C. Tường lửa hoạt động dựa trên các luật (rules) để cho phép hoặc chặn gói tin.
+D. UTM là thế hệ tường lửa tích hợp nhiều chức năng như diệt virus, VPN.
+đáp án: A
+Giải thích: A là phát biểu SAI vì tường lửa thường được đặt ở biên giới mạng (gateway), nó rất khó kiểm soát luồng dữ liệu đi ngang giữa các máy tính trong cùng một mạng nội bộ (LAN), và hacker nội bộ đã ở sẵn bên trong tường lửa rồi.
+
+**16. Trong các biện pháp đối phó, biện pháp nào KHÔNG thuộc nhóm "Phòng ngừa" (Prevention)?**
+A. Cài đặt tường lửa.
+B. Mã hóa dữ liệu.
+C. Sao lưu (Backup) và phục hồi dữ liệu.
+D. Đào tạo nhận thức an ninh cho nhân viên.
 đáp án: C
-Giải thích: C đúng là ngoại lệ vì tin tặc có kỹ năng tinh vi, tự phát triển kỹ thuật để thâm nhập mà không bị nghi ngờ thuộc nhóm tấn công "Có cấu trúc"; A sai vì cá nhân thiếu kinh nghiệm thuộc nhóm phi cấu trúc; B sai vì sử dụng công cụ có sẵn (script kiddies) thuộc nhóm phi cấu trúc; D sai vì mục đích thử nghiệm/thách thức thường gắn với nhóm phi cấu trúc.
+Giải thích: C đúng là đáp án cần chọn vì Sao lưu và phục hồi thuộc nhóm "Phục hồi" (Recovery) - xử lý sau khi sự cố đã xảy ra; A, B, D là các biện pháp làm trước để sự cố không xảy ra (Phòng ngừa).
 
-### Dạng 4: Bẫy từ ngữ
-
-**10. "Xác thực" (Authentication) và "Cấp quyền" (Authorization) là hai khái niệm khác nhau. Theo tài liệu, định nghĩa nào sau đây mô tả chính xác về "Cấp quyền"?**
-A. Xác nhận rằng các bên liên quan trong giao dịch đúng là thực thể họ tuyên bố.
-B. Các quyền được trao cho một cá nhân/tiến trình cho phép truy cập vào tài nguyên.
-C. Đảm bảo thông tin không bị tiết lộ cho người không có phận sự.
-D. Đảm bảo hệ thống hoạt động liên tục cho người dùng hợp lệ.
+**17. Yếu tố nào sau đây KHÔNG phải là một phần của Tam giác CIA?**
+A. Confidentiality (Bí mật)
+B. Authenticity (Tính xác thực)
+C. Integrity (Toàn vẹn)
+D. Availability (Sẵn sàng)
 đáp án: B
-Giải thích: B đúng vì tài liệu định nghĩa Cấp quyền là các quyền cho phép truy cập vào tài nguyên; A sai vì đây là định nghĩa của Xác thực (Authentication); C sai vì đây là định nghĩa của tính Bí mật (Confidentiality); D sai vì đây là định nghĩa của tính Sẵn sàng (Availability).
+Giải thích: B đúng là đáp án cần chọn vì mặc dù Authenticity rất quan trọng, nhưng nó là nguyên tắc bổ sung, không nằm trong bộ 3 chữ cái C-I-A gốc; A, C, D chính là 3 đỉnh của tam giác.
 
-**11. Trong ngữ cảnh các hình thức tấn công, hành động "Giả mạo" (Masquerade) được xếp vào loại tấn công nào?**
-A. Tấn công thụ động vì nó chỉ nghe lén thông tin xác thực.
-B. Tấn công chủ động vì một thực thể mạo danh một thực thể có đặc quyền.
-C. Tấn công thụ động vì kẻ tấn công không làm hỏng phần cứng.
-D. Tấn công chủ động nhưng chỉ khi nó gây ra Từ chối dịch vụ.
+---
+
+### Phần 4: Dạng câu hỏi "Bẫy từ ngữ" (Kiểm tra độ tinh ý và hiểu sâu)
+
+**18. Sự khác biệt chính giữa "Lỗ hổng" (Vulnerability) và "Mối đe dọa" (Threat) là gì?**
+A. Lỗ hổng là từ bên ngoài, Mối đe dọa là từ bên trong.
+B. Lỗ hổng là điểm yếu của hệ thống, Mối đe dọa là tác nhân khai thác điểm yếu đó.
+C. Lỗ hổng là do con người, Mối đe dọa là do máy móc.
+D. Hai thuật ngữ này là đồng nghĩa.
 đáp án: B
-Giải thích: B đúng vì tài liệu phân loại "Giả mạo" (Masquerade) nằm dưới mục Tấn công chủ động,; A sai vì Tấn công thụ động chỉ là nghe lén hoặc phân tích lưu lượng, còn giả mạo tạo ra luồng dữ liệu sai lệch hoặc đóng vai người khác; C sai vì định nghĩa thụ động/chủ động dựa trên việc can thiệp dữ liệu chứ không phải hỏng phần cứng; D sai vì Giả mạo là một loại riêng, không nhất thiết phải gây ra Từ chối dịch vụ mới là chủ động,.
+Giải thích: B đúng vì Lỗ hổng (Vulnerability) là tính chất nội tại (ví dụ: quên khóa cửa), còn Mối đe dọa (Threat) là yếu tố ngoại lai có khả năng gây hại (ví dụ: tên trộm); A sai vì lỗ hổng nằm ở bên trong hệ thống; C sai vì cả hai đều có thể do người hoặc máy.
 
-### Dạng 5: Vị trí thông tin & Định nghĩa
-
-**12. Theo Kiến trúc an ninh OSI (X.800), thành phần nào được định nghĩa là "Một quá trình (hoặc thiết bị) được thiết kế để phát hiện, ngăn chặn hoặc phục hồi hệ thống khi có tấn công"?**
-A. Dịch vụ an ninh (Security Service)
-B. Tấn công an ninh (Security Attack)
-C. Cơ chế an ninh (Security Mechanism)
-D. Chính sách an ninh (Security Policy)
-đáp án: C
-Giải thích: C đúng vì tài liệu định nghĩa Cơ chế an ninh chính xác là quá trình/thiết bị để phát hiện, ngăn chặn, phục hồi; A sai vì Dịch vụ an ninh là dịch vụ truyền thông để bảo vệ tài nguyên; B sai vì Tấn công an ninh là hành động vi phạm nguyên tắc an ninh; D sai vì Chính sách an ninh là khuôn khổ công việc và quy định.
-
-**13. Ba mục tiêu chính cần đạt được của một "Chính sách an toàn thông tin" được nêu trong tài liệu bao gồm những gì?**
-A. Bí mật, Toàn vẹn, Sẵn sàng.
-B. Làm rõ cái gì cần bảo vệ, Ai chịu trách nhiệm, Căn cứ giải quyết tranh chấp.
-C. Phòng ngừa, Phát hiện, Phục hồi.
-D. Tường lửa, IDS, VPN.
+**19. Tại sao nói việc đối phó với "Tấn công thụ động" chủ yếu dựa vào "Phòng ngừa" thay vì "Phát hiện"?**
+A. Vì tấn công thụ động gây thiệt hại quá lớn không thể phục hồi.
+B. Vì tấn công thụ động không để lại dấu vết thay đổi dữ liệu nên rất khó phát hiện.
+C. Vì phần mềm phát hiện quá đắt tiền.
+D. Vì tấn công thụ động chỉ xảy ra trên mạng không dây.
 đáp án: B
-Giải thích: B đúng vì đây là 3 mục tiêu cụ thể của Chính sách ATTT được liệt kê tại; A sai vì đây là các mục tiêu/thuộc tính của An toàn thông tin nói chung (CIA); C sai vì đây là các biện pháp đối phó; D sai vì đây là các công nghệ/giải pháp cụ thể.
+Giải thích: B đúng vì bản chất của thụ động là nghe lén, dữ liệu vẫn đi đến đích bình thường, hệ thống không báo lỗi, nên gần như không thể phát hiện. Do đó phải phòng ngừa trước bằng mã hóa; A sai vì tấn công chủ động mới gây thiệt hại trực tiếp; D sai vì mạng có dây vẫn bị nghe lén.
 
-**14. Theo số liệu trích dẫn từ FBI trong tài liệu, tỷ lệ các sự cố an ninh do "tấn công nội bộ" (insider attacks) chiếm khoảng bao nhiêu phần trăm?**
-A. 20% đến 40%
-B. 40% đến 60%
-C. 60% đến 80%
-D. Dưới 20%
-đáp án: C
-Giải thích: C đúng vì tài liệu trích dẫn FBI cho biết tấn công nội bộ lạm dụng chiếm 60% đến 80% các sự cố được báo cáo; A sai vì con số này thấp hơn thực tế báo cáo; B sai vì chưa đủ mức báo cáo; D sai vì tấn công nội bộ chiếm tỷ lệ rất cao.
+**20. Một mật khẩu như "P@ssw0rd123" tuân thủ quy tắc về độ phức tạp (ký tự đặc biệt, số, chữ hoa), nhưng vẫn bị coi là yếu. Tại sao?**
+A. Vì nó quá dài.
+B. Vì nó sử dụng các thay thế ký tự dễ đoán (Predictable substitutions) và từ điển phổ biến.
+C. Vì nó không chứa dấu cách.
+D. Vì nó không được mã hóa.
+đáp án: B
+Giải thích: B đúng vì theo ví dụ ở Slide 24 ("Up&atm@7!"), mật khẩu mạnh không chỉ là thay thế ký tự đơn giản (@ thay a, 0 thay o) từ một từ có nghĩa, mà cần sự ngẫu nhiên hoặc biến đổi phức tạp hơn để tránh tấn công từ điển; A sai vì dài thường tốt hơn; C, D không liên quan đến độ mạnh nội tại của chuỗi mật khẩu.
+
+**21. Trong bối cảnh chữ ký số, "Chống thoái thác" (Non-repudiation) bảo vệ ai?**
+A. Bảo vệ người gửi khỏi bị người nhận giả mạo.
+B. Bảo vệ người nhận khỏi việc người gửi chối bỏ trách nhiệm.
+C. Bảo vệ hacker khỏi bị phát hiện.
+D. Bảo vệ dữ liệu khỏi bị virus.
+đáp án: B
+Giải thích: B đúng vì Chống thoái thác về nguồn gốc đảm bảo rằng khi A gửi tin cho B, A không thể cãi là "tôi không gửi". Điều này bảo vệ quyền lợi của B (người nhận) khi dùng tin nhắn đó làm bằng chứng; A sai bản chất; C, D sai hoàn toàn.
+
+**22. "Giải pháp an toàn thông tin đơn lẻ" (như chỉ dùng Firewall) được đánh giá như thế nào trong slide?**
+A. Là giải pháp tốt nhất và tiết kiệm nhất.
+B. Là cách tiếp cận không hoàn toàn đúng và không đủ an toàn.
+C. Là tiêu chuẩn bắt buộc của ISO.
+D. Là đủ để chống lại 99% các cuộc tấn công.
+đáp án: B
+Giải thích: B đúng theo Slide 10, tài liệu khẳng định giải pháp đơn lẻ không thể cung cấp đủ sự an toàn mà cần cái nhìn tổng quát (Defense in Depth, kết hợp Chính sách, Con người); A, C, D là các nhận định sai lệch với nội dung slide.
+
+**23. Điểm yếu lớn nhất của hệ thống phát hiện xâm nhập dựa trên sự bất thường (Anomaly-based IDS) là gì?**
+A. Không phát hiện được tấn công Zero-day.
+B. Tỷ lệ cảnh báo giả (False Positive) cao.
+C. Chi phí thấp.
+D. Chỉ hoạt động trên Windows.
+đáp án: B
+Giải thích: B đúng vì để phát hiện cái "bất thường", hệ thống phải định nghĩa thế nào là "bình thường". Khi hành vi người dùng thay đổi hợp lệ (ví dụ: làm việc khuya đột xuất), hệ thống vẫn coi là bất thường và báo động nhầm, gây phiền toái cho quản trị viên; A sai vì đây là điểm mạnh của nó.
+
+**24. Thuật ngữ "Masquerade" (Giả mạo) trong tấn công chủ động khác với "Phishing" (Lừa đảo) ở điểm cốt lõi nào trong ngữ cảnh mạng?**
+A. Masquerade là giả mạo một thực thể có đặc quyền để chiếm quyền, Phishing thường là lừa lấy thông tin.
+B. Masquerade là thụ động, Phishing là chủ động.
+C. Masquerade chỉ xảy ra offline.
+D. Hai từ này hoàn toàn giống nhau.
+đáp án: A
+Giải thích: A đúng vì Masquerade (Slide 42) nhấn mạnh việc "Mạo danh một thực thể có đặc quyền" để vượt qua kiểm soát truy cập hệ thống; Phishing (tuy không định nghĩa sâu trong slide này nhưng là kiến thức liên hệ) thiên về kỹ nghệ xã hội để lừa người dùng; B sai vì cả 2 đều chủ động; C sai.
+
+**25. Tại sao Slide 5 nói máy tính là "vũ khí hủy diệt hàng loạt"?**
+A. Vì nó có thể phát nổ.
+B. Vì các hành động khủng bố mạng có thể gây hậu quả thảm khốc diện rộng chỉ bằng vài cái gõ phím.
+C. Vì máy tính rất nặng.
+D. Vì máy tính chứa nhiều virus sinh học.
+đáp án: B
+Giải thích: B đúng theo trích dẫn của Barack Obama, ám chỉ sức công phá của tấn công mạng đối với cơ sở hạ tầng trọng yếu (điện, nước, tài chính) có tác động ngang ngửa vũ khí truyền thống; A, C, D là nghĩa đen sai lệch.
+
+**26. Trong chu trình PDCA (Plan-Do-Check-Act) được ẩn dụ trong Slide 19 về chính sách, bước "Theo dõi, kiểm tra, quản lý" tương ứng với gì?**
+A. Viết chính sách một lần rồi cất vào tủ.
+B. Chính sách phải được cải tiến liên tục và giám sát thực thi.
+C. Mua phần mềm đắt tiền nhất.
+D. Tuyển dụng nhiều nhân viên bảo vệ.
+đáp án: B
+Giải thích: B đúng vì Slide 19 nhấn mạnh chính sách phải được "theo dõi, kiểm tra, quản lý và cải tiến liên tục" (vòng tròn khép kín), chứ không phải tài liệu tĩnh; A sai quy trình; C, D không liên quan trực tiếp đến vòng đời chính sách.
+
+**27. Một cuộc tấn công làm thay đổi thứ tự các gói tin trong một luồng dữ liệu được xếp vào loại nào?**
+A. Nghe lén.
+B. Thay đổi thông điệp (Modification of messages).
+C. Từ chối dịch vụ.
+D. Phân tích lưu lượng.
+đáp án: B
+Giải thích: B đúng theo Slide 44, "Thay đổi nội dung thông điệp" bao gồm cả việc nội dung bị thay đổi, trì hoãn hoặc "sắp xếp lại" (reordered) để tạo hiệu ứng trái phép; A, D là thụ động; C là làm nghẽn.
+
+**28. Code Red, được nhắc đến trong bài tập cuối chương, là ví dụ của loại mã độc nào và cơ chế lây lan của nó?**
+A. Virus - lây qua USB.
+B. Worm - tự nhân bản qua mạng khai thác lỗ hổng.
+C. Trojan - ẩn trong phần mềm hợp lệ.
+D. Spyware - theo dõi bàn phím.
+đáp án: B
+Giải thích: B đúng (dựa trên kiến thức thực tế được gợi ý ở phần bài tập slide 73, mục câu hỏi trắc nghiệm số 5), Worm khác Virus ở chỗ nó không cần vật chủ (file) để bám vào mà tự tìm lỗ hổng mạng để nhảy từ máy này sang máy khác.
+
+**29. Dịch vụ "Toàn vẹn không hướng kết nối" (Connectionless Integrity) khác gì với "Toàn vẹn có hướng kết nối"?**
+A. Nó bảo vệ từng gói tin riêng lẻ nhưng không phát hiện được việc mất gói hoặc gói bị đảo thứ tự.
+B. Nó bảo vệ cả luồng dữ liệu liên tục.
+C. Nó phát hiện được việc phát lại (replay).
+D. Nó yêu cầu phải có kết nối Internet.
+đáp án: A
+Giải thích: A đúng theo Slide 56, Toàn vẹn không hướng kết nối chỉ xem xét từng thông điệp cụ thể xem có bị sửa không, còn Toàn vẹn có hướng kết nối (Connection-oriented) mới kiểm soát được cả dòng thông điệp (mất, trùng, sai thứ tự); B, C là đặc điểm của có hướng kết nối.
+
+**30. Mục đích chính của việc "Phân loại thông tin" (ví dụ: Tuyệt mật, Mật, Nội bộ) trong Chính sách an toàn thông tin là gì?**
+A. Để làm khó nhân viên.
+B. Để xác định giá trị tài sản và áp dụng mức độ bảo vệ phù hợp (tránh lãng phí hoặc bảo vệ không đủ).
+C. Để công khai lên website.
+D. Để bán dữ liệu lấy tiền.
+đáp án: B
+Giải thích: B đúng vì Slide 20 nói về mục tiêu chính sách là "Làm rõ cái gì đang được bảo vệ và vì sao". Phân loại giúp biết cái nào quan trọng (Tuyệt mật) cần đầu tư bảo mật nhiều, cái nào ít quan trọng (Công khai) thì không cần tốn kém; A, C, D sai mục đích.
