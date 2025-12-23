@@ -1,197 +1,206 @@
-Chào bạn, để nắm vững chương **Bảo mật tầng IP (IPsec)** mà không bị "ngợp" trong biển kiến thức, đây là bản tổng hợp cô đọng những nội dung **cốt lõi và trọng tâm nhất** (những phần này chiếm 80-90% nội dung thi cử và phỏng vấn).
+Chào bạn, đây là **Tài liệu Lý thuyết Tổng hợp IPsec từ A-Z** được thiết kế chuyên biệt để mang vào phòng thi (Open Book).
+
+Tài liệu này được cấu trúc lại để **tối ưu hóa tốc độ tra cứu**. Khi gặp câu hỏi trắc nghiệm, bạn chỉ cần tìm đúng mục từ khóa tương ứng.
 
 ---
 
-### 1. Vị trí và Đặc điểm của IPsec
+# TÀI LIỆU TRA CỨU TỔNG HỢP: BẢO MẬT TẦNG IP (IPsec)
 
-- **Vị trí:** Hoạt động tại **Tầng Mạng (Network Layer - Layer 3)**.
-- **Đặc điểm quan trọng nhất:**
-  - **Trong suốt (Transparent):** Các ứng dụng (Web, Mail) và người dùng không cần cài đặt hay sửa đổi gì, mọi việc xử lý diễn ra ngầm ở tầng OS/Router.
-  - **Bảo vệ toàn diện:** Bảo vệ tất cả dữ liệu đi qua mạng IP (TCP, UDP, ICMP...).
-- **Ứng dụng chính:** Làm nền tảng cho **VPN (Virtual Private Network)**.
+## PHẦN 1: TỔNG QUAN & VỊ TRÍ
 
----
+### 1. Định nghĩa & Vị trí
 
-### 2. Hai giao thức chính (IPsec Protocols)
+- **Vị trí:** Tầng Mạng (Network Layer - Layer 3) trong mô hình OSI.
+- **Đối tượng bảo vệ:** Gói tin IP (IP Packet). Bảo vệ tất cả giao thức tầng trên (TCP, UDP, ICMP, BGP, OSPF...).
+- **Tính chất:**
+  - **Trong suốt (Transparent):** Ứng dụng và người dùng cuối không biết sự tồn tại của IPsec.
+  - **Bắt buộc:** Với IPv6 (về lý thuyết), **Tùy chọn:** Với IPv4.
 
-Bạn cần phân biệt rõ AH và ESP:
+### 2. Các dịch vụ bảo mật chính (RFC 4301)
 
-- **AH (Authentication Header):**
-  - Chỉ cung cấp **Xác thực** và **Toàn vẹn** (biết ai gửi, gói tin không bị sửa).
-  - **KHÔNG mã hóa** dữ liệu (người khác vẫn đọc được nội dung).
-  - _Hiện nay ít dùng._
-- **ESP (Encapsulating Security Payload) - Quan trọng hơn:**
-  - Cung cấp cả **Mã hóa** (Bảo mật) + **Xác thực** + **Toàn vẹn**.
-  - Có thêm trường **Padding** (đệm) để che giấu độ dài dữ liệu và căn chỉnh khối mã hóa.
-
----
-
-### 3. Hai chế độ hoạt động (Modes) - Cực kỳ quan trọng
-
-Đây là phần hay bị hỏi thi nhất. Hãy nhớ bảng so sánh này:
-
-| Đặc điểm           | Transport Mode (Vận chuyển)                 | Tunnel Mode (Đường hầm)                              |
-| :----------------- | :------------------------------------------ | :--------------------------------------------------- |
-| **Phạm vi bảo vệ** | Chỉ mã hóa phần ruột (**Payload**: TCP/UDP) | Mã hóa **toàn bộ gói IP gốc** (Cả Header + Payload)  |
-| **IP Header**      | Giữ nguyên IP Header gốc                    | Tạo **IP Header mới** bọc bên ngoài                  |
-| **Mô hình**        | **Host-to-Host** (Máy tính tới Máy tính)    | **Gateway-to-Gateway** (VPN Site-to-Site)            |
-| **Địa chỉ IP**     | Lộ IP nguồn/đích thật                       | Giấu IP thật, chỉ hiện IP của cổng bảo mật (Gateway) |
+1.  **Kiểm soát truy cập (Access Control):** Chặn/Cho phép qua SPD.
+2.  **Toàn vẹn dữ liệu (Data Integrity):** Chống sửa đổi gói tin (dùng HMAC).
+3.  **Xác thực nguồn gốc (Data Origin Authentication):** Biết chính xác ai gửi.
+4.  **Chống phát lại (Anti-Replay):** Chống hacker gửi lại gói cũ.
+5.  **Bí mật dữ liệu (Confidentiality):** Mã hóa nội dung (Chỉ có ở ESP).
+6.  **Bí mật luồng (Traffic Flow Confidentiality):** Che giấu ai đang nói chuyện với ai (dùng Padding).
 
 ---
 
-### 4. Kiến trúc & Chính sách (SPD và SAD)
+## PHẦN 2: CÁC GIAO THỨC THÀNH PHẦN (AH vs ESP)
 
-Hãy hình dung IPsec hoạt động như một hải quan kiểm soát cửa khẩu:
+_Mục này dùng để trả lời câu hỏi: Giao thức nào làm được việc gì?_
 
-- **SA (Security Association - Liên kết bảo mật):**
-  - Là một thỏa thuận kết nối **một chiều** (One-way). Để A chat với B cần **2 SA** (chiều đi và chiều về).
-  - Định danh SA bằng bộ ba: **< SPI, IP Đích, Giao thức (ESP/AH) >**.
-- **SPD (Security Policy Database - CSDL Chính sách):**
-  - Chứa các **Luật (Rules)**.
-  - Trả lời câu hỏi: _"Gói tin này làm gì?"_ -> **Bypass** (Cho qua), **Discard** (Chặn), hay **Protect** (Mã hóa).
-- **SAD (Security Association Database - CSDL Liên kết):**
-  - Chứa các **Tham số kỹ thuật** của kết nối đang chạy.
-  - Trả lời câu hỏi: _"Mã hóa bằng khóa nào? Thuật toán gì?"_.
-
-**Quy trình xử lý (Flow):**
-
-- **Gửi đi:** Tra **SPD** (xem luật) -> Tra **SAD** (lấy khóa) -> Mã hóa.
-- **Nhận về:** Tra **SAD** (dựa vào SPI để lấy khóa) -> Giải mã -> Tra **SPD** (kiểm tra lại luật xem gói tin đã giải mã có được phép vào không).
+| Đặc điểm             | **AH (Authentication Header)**                                          | **ESP (Encapsulating Security Payload)**                        |
+| :------------------- | :---------------------------------------------------------------------- | :-------------------------------------------------------------- |
+| **RFC**              | RFC 4302                                                                | RFC 4303                                                        |
+| **Chức năng chính**  | Xác thực + Toàn vẹn                                                     | **Mã hóa (Bí mật)** + Xác thực + Toàn vẹn                       |
+| **Mã hóa dữ liệu**   | **KHÔNG** (Dữ liệu đi trần)                                             | **CÓ** (Dữ liệu được mã hóa)                                    |
+| **Phạm vi xác thực** | Toàn bộ gói tin (Cả IP Header gốc + Payload)                            | Chỉ xác thực phần Header ESP, Payload và Trailer                |
+| **Vấn đề với NAT**   | **Không tương thích** (Do NAT đổi IP Header làm sai lệch mã băm của AH) | **Tương thích tốt** (Vì ESP không xác thực IP Header bên ngoài) |
+| **Vị trí Header**    | Nằm sau IP Header, trước TCP/UDP                                        | Nằm sau IP Header, bao bọc TCP/UDP                              |
+| **Khi nào dùng?**    | Khi chỉ cần xác thực, không cần giấu nội dung (ít dùng).                | Khi cần bảo mật nội dung (VPN, giao dịch).                      |
 
 ---
 
-### 5. Giao thức trao đổi khóa (IKE)
+## PHẦN 3: CÁC CHẾ ĐỘ HOẠT ĐỘNG (Transport vs Tunnel)
 
-- **Vai trò:** Tự động đàm phán và sinh khóa bí mật chung cho hai bên chưa từng quen biết (thay vì nhập tay thủ công).
-- **Cơ chế:** Dựa trên thuật toán **Diffie-Hellman**.
-- **Hai giai đoạn (Phases):**
-  - _Phase 1:_ Tạo ra một kênh bảo mật để bảo vệ việc trao đổi khóa (IKE SA).
-  - _Phase 2:_ Dùng kênh bảo mật đó để tạo cặp khóa cho việc truyền dữ liệu thật (IPsec SA).
-- **Tính năng:** Dùng **Cookie** để chống tấn công DoS, dùng **Nonce** để chống Replay.
+_Mục quan trọng nhất để xử lý câu hỏi tình huống/sơ đồ._
 
----
+### Bảng so sánh chi tiết
 
-### 6. Tính năng Chống phát lại (Anti-Replay)
+| Tiêu chí                    | **Transport Mode (Vận chuyển)**                                            | **Tunnel Mode (Đường hầm)**                                               |
+| :-------------------------- | :------------------------------------------------------------------------- | :------------------------------------------------------------------------ |
+| **Mô hình kết nối**         | **Host-to-Host** (Máy - Máy)                                               | **Gateway-to-Gateway** (VPN Site-to-Site) hoặc Host-to-Gateway            |
+| **Cấu trúc gói tin**        | `[IP Gốc] [ESP/AH] [Payload]`                                              | `[IP Mới] [ESP/AH] [IP Gốc] [Payload]`                                    |
+| **Header IP**               | Giữ nguyên IP Header gốc.                                                  | **Tạo IP Header mới** bọc bên ngoài.                                      |
+| **Phạm vi bảo vệ**          | Chỉ bảo vệ phần tải (Payload - TCP/UDP).                                   | Bảo vệ **toàn bộ gói IP gốc** (cả Header cũ).                             |
+| **Địa chỉ IP**              | **Lộ** địa chỉ IP nguồn/đích thực sự.                                      | **Ẩn** địa chỉ IP thực sự bên trong. Chỉ hiện IP của Router/Gateway.      |
+| **Overhead (Dữ liệu thừa)** | Thấp (chỉ thêm vài byte header).                                           | Cao (thêm cả một IP Header mới 20 bytes).                                 |
+| **Khi nào dùng?**           | Quản trị viên remote vào Server; 2 Server trao đổi dữ liệu trong cùng LAN. | Kết nối 2 chi nhánh công ty qua Internet; Nhân viên làm việc từ xa (VPN). |
 
-- **Vấn đề:** Hacker copy gói tin cũ (đã mã hóa) và gửi lại để lừa hệ thống.
-- **Giải pháp:** Dùng **Sequence Number** (Số thứ tự).
-- **Cơ chế:** Dùng **Cửa sổ trượt (Sliding Window)** (thường là 64 gói).
-  - Gói tin có số thứ tự _nhỏ hơn_ mép trái cửa sổ (quá cũ) -> **Vứt bỏ**.
-  - Gói tin nằm trong cửa sổ nhưng đã đánh dấu là nhận rồi -> **Vứt bỏ**.
-  - Gói tin hợp lệ -> Cập nhật cửa sổ.
+### Sơ đồ gói tin (Để nhìn hình đoán chế độ)
 
----
-
-### Tóm tắt "bỏ túi" để đi thi:
-
-1.  **ESP** > AH (ESP vừa mã hóa vừa xác thực).
-2.  **Tunnel Mode** = VPN (Tạo IP Header mới).
-3.  **Transport Mode** = End-to-End (Giữ IP Header cũ).
-4.  **SA** là 1 chiều; **SPI** là định danh của SA.
-5.  **SPD** là Luật; **SAD** là Khóa.
-6.  **IKE** dùng để lấy khóa tự động.
-7.  **Padding** dùng để che giấu độ dài.
-
-Nắm vững 7 điểm này là bạn đã nắm được "xương sống" của chương IPsec. Chúc bạn học tốt!
-Chào bạn, dưới đây là lời giải chi tiết cho đề ôn tập chương IX môn "Mật mã và An ninh mạng" dựa trên hình ảnh bạn cung cấp.
+- **Transport + ESP:** `Original IP` | `ESP Header` | `TCP/UDP` | `Data` | `ESP Trailer`
+- **Tunnel + ESP:** `NEW IP` | `ESP Header` | `Original IP` | `TCP/UDP` | `Data` | `ESP Trailer`
+  _(Mẹo: Thấy "New IP" hoặc 2 lớp IP là Tunnel)_
 
 ---
 
-# PHẦN I: CÂU HỎI TỰ LUẬN (Lý thuyết)
+## PHẦN 4: KIẾN TRÚC & CHÍNH SÁCH (SA, SPD, SAD)
 
-**Câu 1: Hãy trình bày các lợi ích của IPsec**
+_Mục này dùng để trả lời câu hỏi về quy trình xử lý._
 
-- **Giải chi tiết:**
-  1.  **Tính trong suốt với ứng dụng:** IPsec hoạt động ở tầng mạng (Layer 3), nên các ứng dụng (web, mail, ftp...) không cần phải thay đổi hay cài đặt thêm gì để được bảo vệ.
-  2.  **Tính trong suốt với người dùng:** Người dùng cuối không cần phải thao tác đăng nhập hay cấu hình phức tạp mỗi khi sử dụng (sau khi đã thiết lập xong).
-  3.  **Bảo vệ toàn diện:** Vì nằm ở tầng IP, IPsec bảo vệ tất cả các giao thức tầng trên (TCP, UDP, ICMP...) đi qua mạng.
-  4.  **Cung cấp các dịch vụ bảo mật mạnh mẽ:**
-      - Bí mật (Confidentiality - Mã hóa).
-      - Toàn vẹn (Integrity - Chống sửa đổi).
-      - Xác thực nguồn gốc (Data Origin Authentication).
-      - Chống phát lại (Anti-replay).
-  5.  **Bảo mật cho định tuyến:** Giúp bảo vệ cấu trúc hạ tầng mạng bằng cách xác thực các bản tin định tuyến giữa các Router.
+### 1. SA (Security Association) - Liên kết bảo mật
 
-**Câu 2: Hãy cho biết các chế độ hoạt động của IPsec**
+- **Định nghĩa:** Là một hợp đồng bảo mật logic giữa 2 thiết bị.
+- **Đặc điểm:**
+  - **Một chiều (Simplex):** Cần 1 cặp SA (Inbound + Outbound) để giao tiếp 2 chiều.
+  - **Định danh duy nhất (3 tham số):** `< SPI, Địa chỉ IP đích, Giao thức (AH/ESP) >`.
+- **SPI (Security Parameter Index):** Một con số 32-bit ngẫu nhiên dán trên gói tin để Router biết gói tin này thuộc về SA nào.
 
-- **Giải chi tiết:** Có 2 chế độ chính:
-  1.  **Chế độ Vận chuyển (Transport Mode):**
-      - Chỉ bảo vệ phần tải (payload - ví dụ: TCP/UDP segment) của gói tin IP.
-      - Tiêu đề IP gốc (Original IP Header) được giữ nguyên.
-      - Thường dùng cho kết nối End-to-End (Máy tính đến Máy tính).
-  2.  **Chế độ Đường hầm (Tunnel Mode):**
-      - Bảo vệ toàn bộ gói tin IP gốc (cả Header và Payload).
-      - Gói tin gốc được mã hóa/xác thực và đóng gói vào trong một gói tin IP mới (New IP Header).
-      - Thường dùng cho kết nối VPN Site-to-Site (Router đến Router) hoặc Remote Access (Máy tính đến Router).
+### 2. CSDL Chính sách & Liên kết (SPD vs SAD)
 
-**Câu 3: Phân biệt chế độ đường hầm với AH và chế độ đường hầm với ESP**
-
-- **Giải chi tiết:**
-  - **Giống nhau:** Cả hai đều tạo ra một tiêu đề IP mới (New IP Header) bọc bên ngoài gói tin IP gốc.
-  - **Khác nhau:**
-    - **Tunnel Mode với AH (Authentication Header):** Chỉ cung cấp tính xác thực và toàn vẹn cho toàn bộ gói tin (bao gồm cả gói IP gốc bên trong và các phần không thay đổi của IP Header mới). **KHÔNG** mã hóa dữ liệu (nội dung bên trong vẫn đọc được).
-    - **Tunnel Mode với ESP (Encapsulating Security Payload):** Cung cấp tính xác thực, toàn vẹn **VÀ tính bí mật (Mã hóa)**. Gói IP gốc bên trong sẽ được mã hóa hoàn toàn, người ngoài không đọc được nội dung và địa chỉ IP gốc.
-
-**Câu 4: Cho biết mối quan hệ giữa liên kết bảo mật (SA) và CSDL SAD**
-
-- **Giải chi tiết:**
-  - **SA (Security Association):** Là một thỏa thuận logic duy nhất giữa hai thiết bị về cách bảo mật luồng dữ liệu (dùng thuật toán gì, khóa gì, chế độ nào...). SA là kết nối một chiều.
-  - **SAD (Security Association Database):** Là cơ sở dữ liệu lưu trữ tất cả các SA đang hoạt động trên thiết bị.
-  - **Mối quan hệ:** SAD là nơi chứa (container), còn SA là các bản ghi (record) nằm trong đó. Khi một gói tin IPsec đến, thiết bị sẽ dùng chỉ số SPI (Security Parameter Index) trên gói tin để tìm kiếm (lookup) bản ghi SA tương ứng trong SAD để biết cách xử lý gói tin đó.
-
-**Câu 5: Trình bày cách thức chống phát lại mà chế độ ESP sử dụng**
-
-- **Giải chi tiết:**
-  - Sử dụng trường **Sequence Number (Số thứ tự)** trong tiêu đề ESP. Mỗi gói tin gửi đi sẽ được tăng số thứ tự lên 1.
-  - Bên nhận sử dụng cơ chế **Cửa sổ trượt (Sliding Window)** (thường kích thước là 64):
-    - Nếu nhận được gói tin có số thứ tự _nhỏ hơn_ mép trái cửa sổ (gói quá cũ) -> Loại bỏ.
-    - Nếu nhận được gói tin nằm trong cửa sổ nhưng đã được đánh dấu là nhận rồi -> Loại bỏ (đây là gói phát lại).
-    - Nếu nhận được gói tin hợp lệ (mới hoặc nằm trong cửa sổ nhưng chưa nhận) -> Chấp nhận và cập nhật trạng thái cửa sổ.
-
-**Câu 6: Hãy cho biết các khác biệt giữa IKEv1 và IKEv2**
-
-- **Giải chi tiết:**
-  - **Hiệu suất:** IKEv2 nhanh hơn và hiệu quả hơn, cần ít bước trao đổi thông điệp hơn để thiết lập đường hầm (IKEv2 thường chỉ cần 4 message, trong khi IKEv1 cần 6-9 message ở chế độ Main/Aggressive Mode).
-  - **Độ tin cậy:** IKEv2 có tích hợp sẵn cơ chế truyền lại tin cậy (reliability), trong khi IKEv1 phụ thuộc vào cơ chế timeout.
-  - **Hỗ trợ di động (Mobility):** IKEv2 hỗ trợ tốt cho người dùng di động (ví dụ: giao thức MOBIKE), cho phép duy trì kết nối VPN khi chuyển đổi mạng (từ Wifi sang 4G), IKEv1 không hỗ trợ tốt điều này.
-  - **Tính đơn giản:** IKEv2 hợp nhất các chế độ phức tạp của IKEv1 thành một cơ chế trao đổi đơn giản hơn.
+| Đặc điểm           | **SPD (Security Policy Database)**                             | **SAD (Security Association Database)**                                 |
+| :----------------- | :------------------------------------------------------------- | :---------------------------------------------------------------------- |
+| **Vai trò**        | Là **Luật pháp** (Rules). Quyết định số phận gói tin.          | Là **Kỹ thuật** (Parameters). Chứa chìa khóa để thực thi.               |
+| **Nội dung**       | Bộ chọn (Selectors): IP nguồn/đích, Port, Giao thức.           | Khóa mã hóa, Khóa xác thực, Thuật toán, Sequence Number, SPI, Lifetime. |
+| **Hành động**      | **Discard** (Hủy), **Bypass** (Cho qua), **Protect** (Bảo vệ). | Mã hóa/Giải mã, Xác thực.                                               |
+| **Quy trình gửi**  | Tra SPD trước -> Quyết định Protect -> Tra SAD.                | Tra SAD để lấy khóa mã hóa.                                             |
+| **Quy trình nhận** | Tra SPD sau khi giải mã để kiểm tra lại quyền.                 | Tra SAD trước (dựa vào SPI) để lấy khóa giải mã.                        |
 
 ---
 
-# PHẦN II: CÂU HỎI TRẮC NGHIỆM
+## PHẦN 5: QUẢN LÝ KHÓA (IKE - Internet Key Exchange)
 
-**Câu 1: Giao thức IPSec hoạt động ở tầng nào trong mô hình OSI?**
+_Mục này dùng cho các câu hỏi nâng cao về thiết lập kết nối._
 
-- **Đáp án:** **c. Mạng (Network)**
-- **Giải thích:** Tên đầy đủ là IP Security (Bảo mật giao thức Internet). IP nằm ở tầng Network (Layer 3), nên IPsec hoạt động tại tầng này.
+### 1. Tổng quan IKE
 
-**Câu 2: Chọn phát biểu đúng trong các phát biểu sau:**
+- **Mục đích:** Tự động thỏa thuận SA và sinh khóa bí mật chung (Session Key).
+- **Giao thức nền:** ISAKMP (Khung) + Oakley (Thuật toán trao đổi khóa Diffie-Hellman).
+- **Cổng hoạt động:** **UDP 500**.
 
-- **Đáp án:** **a. AH hỗ trợ xác thực và toàn vẹn. ESP hỗ trợ tính bí mật, xác thực và toàn vẹn.**
-- **Giải thích:**
-  - AH (Authentication Header): Chỉ xác thực (biết ai gửi) và toàn vẹn (không bị sửa), không mã hóa (không bí mật).
-  - ESP (Encapsulating Security Payload): Có mã hóa (bí mật) và tùy chọn xác thực + toàn vẹn.
+### 2. So sánh IKEv1 và IKEv2 (Rất hay thi)
 
-**(Dựa vào hình ảnh cho câu 3 và 4: New IP | AH | Origin IP | TCP | Data)**
-_Hình ảnh này mô tả cấu trúc gói tin có IP mới bọc IP cũ, và sử dụng giao thức AH._
+| Tiêu chí           | **IKEv1**                                         | **IKEv2**                                                         |
+| :----------------- | :------------------------------------------------ | :---------------------------------------------------------------- |
+| **Độ phức tạp**    | Cao. Nhiều chế độ (Main, Aggressive, Quick Mode). | **Đơn giản hóa**. Chỉ có 1 cơ chế trao đổi ban đầu.               |
+| **Số lượng tin**   | Cần 6-9 tin nhắn để thiết lập.                    | Chỉ cần **4 tin nhắn** (2 cặp request/response).                  |
+| **Độ tin cậy**     | Không có cơ chế truyền lại (dựa vào timeout).     | Có cơ chế **truyền lại tin cậy** (Reliability).                   |
+| **Hỗ trợ di động** | Kém. Mất kết nối khi đổi mạng.                    | **Rất tốt** (MOBIKE). Giữ kết nối khi chuyển Wifi/4G.             |
+| **Xác thực**       | Khó tích hợp EAP.                                 | Hỗ trợ chuẩn **EAP** (dùng cho xác thực người dùng doanh nghiệp). |
+| **Chống DoS**      | Yếu hơn.                                          | Tích hợp sẵn cơ chế **Cookie** để chống DoS.                      |
 
-**Câu 3: Cho biết chế độ hoạt động của IPsec:**
+### **BỔ SUNG VÀO PHẦN 5: QUẢN LÝ KHÓA (IKE)**
 
-- **Đáp án:** **b. Đường hầm (Tunnel)**
-- **Giải thích:** Trong hình vẽ có xuất hiện **New IP** (IP mới) và **Origin IP** (IP gốc) nằm bên trong. Việc bọc gói IP gốc vào trong một gói IP mới là đặc điểm nhận dạng của chế độ Đường hầm (Tunnel Mode).
+(Chèn vào dưới bảng so sánh IKEv1/IKEv2)
 
-**Câu 4: Những phần nào sẽ được xác thực?**
+### 2\. IKEv1 (Phức tạp - Có 2 Phase)
 
-- **Đáp án:** **d. Tất cả các phần trên hình trừ một số biến trong New IP như TTL, ...**
-- **Giải thích:** Giao thức AH (Authentication Header) cung cấp tính toàn vẹn cho **toàn bộ gói tin**, bao gồm: Payload, IP Header gốc, và cả các phần không thay đổi (immutable) của IP Header mới. Nó chỉ trừ ra các trường thay đổi trong quá trình định tuyến như TTL (Time To Live) hay Header Checksum.
+###
 
-**(Dựa vào hình ảnh cho câu 5: Hai Router kết nối qua IPSec Tunnel)**
+- **Phase 1 (Tạo kênh bảo mật IKE SA):** Có 2 chế độ:
 
-**Câu 5: Hãy cho biết chế độ và giao thức IPsec nào có thể được sử dụng để ẩn địa chỉ IP của các máy chủ? (chọn nhiều câu trả lời)**
+  - **Main Mode:** 6 tin nhắn. An toàn cao, **ẩn danh tính** các bên.
+  - **Aggressive Mode:** 3 tin nhắn. Nhanh hơn, nhưng **lộ danh tính** (Identity không được mã hóa).
 
-- **Đáp án:** **b. Đường hầm** và **d. ESP**
-- **Giải thích:**
-  - Để ẩn địa chỉ IP của máy chủ (Origin IP - ví dụ 10.1.1.1), ta phải giấu nó đi.
-  - Chế độ **Đường hầm (Tunnel Mode - b)** sẽ biến IP của máy chủ thành phần dữ liệu bên trong (Inner IP), và dùng IP của Router (10.1.1.1/24 là mạng LAN, IP Router sẽ là IP Public) làm địa chỉ bên ngoài.
-  - Tuy nhiên, nếu chỉ dùng Tunnel với AH, người ta vẫn đọc được IP bên trong (vì AH không mã hóa). Do đó, bắt buộc phải dùng giao thức **ESP (d)** để **mã hóa** toàn bộ phần nội dung bên trong, bao gồm cả địa chỉ IP máy chủ gốc.
-  - Vậy đáp án cần chọn là **b** (để đóng gói) và **d** (để mã hóa/làm ẩn thông tin).
+- **Phase 2 (Tạo kênh dữ liệu IPsec SA):**
+
+  - **Quick Mode:** 3 tin nhắn. Dùng kênh của Phase 1 để tạo SA cho AH/ESP.
+
+### 3\. Quy trình trao đổi IKEv2 (4 tin nhắn)
+
+- **Cặp tin 1:**
+
+  - **Nội dung:** Trao đổi thông số **Diffie-Hellman (KE)** và số ngẫu nhiên **(Nonce)**.
+  - **Mục đích:** Tạo ra khóa bí mật chung. **Chưa xác thực danh tính** (Dữ liệu chưa được mã hóa).
+
+- **Cặp tin 2:**
+
+  - **Nội dung:** Gửi chứng chỉ/ID để chứng minh danh tính.
+  - **Mục đích:** **Xác thực** hai bên và thiết lập SA đầu tiên (Child SA) để truyền dữ liệu. (Dữ liệu đoạn này đã được mã hóa).
+
+---
+
+## PHẦN 6: CÁC CƠ CHẾ KỸ THUẬT ĐẶC BIỆT
+
+_Mục này dành cho các câu hỏi bẫy hoặc chi tiết sâu._
+
+### Perfect Forward Secrecy (PFS) - Tính bí mật chuyển tiếp hoàn hảo
+
+###
+
+- **Ý nghĩa:** Nếu khóa bí mật dài hạn (Master Key) bị lộ, các khóa phiên (Session Key) trong quá khứ **vẫn an toàn**.
+- **Cách làm:** Mỗi lần tạo SA mới, chạy lại thuật toán Diffie-Hellman để sinh khóa mới hoàn toàn độc lập, không phụ thuộc khóa cũ.
+
+### 5\. Bộ mật mã (Cipher Suite) - Slide 49
+
+###
+
+- Cấu hình VPN phải khớp nhau 4 tham số:
+
+  - Mã hóa (Encryption): AES, 3DES.
+  - Hàm băm (Hash): SHA-256, SHA-1, MD5.
+  - Xác thực (Auth): Pre-shared Key hoặc RSA Signature.
+  - Nhóm Diffie-Hellman (DH Group): Group 14 (2048 bit), Group 2...
+
+- **Suite B:** Bộ chuẩn bảo mật cao của NSA (Dùng AES-GCM, SHA-256/384, Elliptic Curve).
+
+### 1. Chống phát lại (Anti-Replay)
+
+- **Công cụ:** Sequence Number (Số thứ tự - 32 bit hoặc 64 bit).
+- **Cơ chế:** **Cửa sổ trượt (Sliding Window)**.
+  - Window Size mặc định: 64 gói.
+  - Gói có $Seq < (N - W)$ (Cũ hơn mép trái cửa sổ) $\rightarrow$ **Vứt bỏ**.
+  - Gói trùng Seq trong cửa sổ $\rightarrow$ **Vứt bỏ**.
+  - Gói Seq hợp lệ $\rightarrow$ Cập nhật cửa sổ.
+- **Lưu ý:** Seq Number không bao giờ quay vòng (Wrap around). Khi đếm hết $2^{32}$, phải tạo SA mới (Rekey).
+
+### 2. Padding (Phần đệm trong ESP)
+
+- **3 Mục đích:**
+  1.  Làm đầy khối mã hóa (Block Alignment - ví dụ AES cần khối 128 bit).
+  2.  Căn chỉnh bộ nhớ (32-bit Alignment).
+  3.  **Che giấu độ dài thực (Traffic Flow Confidentiality):** Bơm thêm dữ liệu rác để hacker không đoán được nội dung qua độ dài.
+
+### 3. NAT-Traversal (NAT-T)
+
+- **Vấn đề:** IPsec (đặc biệt là AH) không đi qua được NAT. ESP cũng gặp khó khăn vì NAT thay đổi cổng.
+- **Giải pháp:** Đóng gói gói tin IPsec vào trong một gói **UDP cổng 4500**.
+- **Nhận diện:** Nếu thấy traffic UDP 4500, đó là IPsec đang chạy qua NAT.
+
+---
+
+## MẸO TRA CỨU TRẮC NGHIỆM NHANH (Cheat Sheet)
+
+1.  Thấy **"Ẩn địa chỉ IP"** / **"New IP Header"** $\rightarrow$ Chọn **Tunnel Mode**.
+2.  Thấy **"Kết nối Host-to-Host"** / **"Giữ nguyên IP Header"** $\rightarrow$ Chọn **Transport Mode**.
+3.  Thấy **"Chỉ xác thực, không mã hóa"** $\rightarrow$ Chọn **AH**.
+4.  Thấy **"Bảo mật, Mã hóa, Bí mật"** $\rightarrow$ Chọn **ESP**.
+5.  Thấy **"Trao đổi khóa"** / **"Diffie-Hellman"** / **"UDP 500"** $\rightarrow$ Chọn **IKE**.
+6.  Thấy **"Chống tắc nghẽn (Clogging/DoS)"** trong IKE $\rightarrow$ Chọn **Cookie**.
+7.  Thấy **"Chống phát lại"** $\rightarrow$ Chọn **Sequence Number** hoặc **Sliding Window**.
+8.  Thấy **"32-bit ngẫu nhiên định danh kết nối"** $\rightarrow$ Chọn **SPI**.
+9.  Thấy **"Đơn giản, Hiệu quả, Hỗ trợ di động"** $\rightarrow$ Chọn **IKEv2**.
+10. Thấy **"Kết hợp IPsec"** (ví dụ vừa xác thực vừa mã hóa riêng) $\rightarrow$ Chọn **SA Bundle** (Gói SA).

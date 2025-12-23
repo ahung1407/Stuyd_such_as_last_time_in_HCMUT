@@ -1,178 +1,170 @@
-Chào bạn, đây là bản **tổng hợp "xương sống"** (Cheat Sheet) của Chương 5. Đây là những kiến thức cốt lõi nhất bạn cần nắm để thi qua môn hoặc trả lời phỏng vấn, đã được lọc bỏ các chi tiết rườm rà.
+### CÁC THÀNH PHẦN NAC (Theo Slide 5)
 
-Chương này chia làm 2 phần lớn: **NAC** và **Cloud**.
+Đây là kiến thức tổng quát về NAC (trước khi đi sâu vào 802.1X). Đề thi dùng các thuật ngữ này rất nhiều.
 
----
+| Thành phần                  | Tên gọi khác                         | Vai trò cốt lõi (Từ khóa thi)                                                                 | Ví dụ thực tế                                            |
+| --------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| AR (Access Requester)       | Supplicant, Client, Nút (Node)       | Người xin vào. Thiết bị đang cố gắng kết nối.                                                 | Laptop, PC, Camera, Máy in.                              |
+| NAS (Network Access Server) | Authenticator, Gateway, Access Point | Người thực thi / Điểm kiểm soát. Chặn hoặc cho phép gói tin đi qua. Là điểm kết nối đầu tiên. | Switch, Router, Wireless Access Point (AP), VPN Gateway. |
+| Policy Server               | Authentication Server (AS)           | Người ra quyết định. Xác định quyền hạn (VLAN nào, ACL nào). Kiểm tra sức khỏe.               | Cisco ISE, Aruba ClearPass, FreeRADIUS.                  |
 
-### PHẦN 1: KIỂM SOÁT TRUY CẬP MẠNG (NAC) & 802.1X
+### GIẢI THÍCH MỐI LIÊN HỆ ĐỂ TRÁNH BẪY:
 
-**1. Tư duy cốt lõi của NAC:**
+- **NAS chính là Authenticator:**
 
-- Không chỉ hỏi _"Bạn là ai?"_ (Authentication).
-- Mà quan trọng nhất là hỏi _"Bạn có khỏe không?"_ (**Health Check/Posture Assessment**).
-- _Ví dụ:_ Máy tính phải cài Antivirus, update Windows mới được vào mạng. Nếu không -> Bị đẩy vào VLAN cách ly (Quarantine).
+  - Trong lý thuyết tổng quát gọi là **NAS**.
+  - Trong chuẩn 802.1X gọi là **Authenticator**.
+  - Trong thực tế nó là cái **Switch**.
+  - Chức năng chung: **Thực thi** (Enforce). Nếu Policy Server bảo "Chặn", NAS sẽ là thằng trực tiếp chặn gói tin.
 
-**2. Bộ ba quyền lực (Kiến trúc 802.1X):**
-Cần nhớ vị trí và vai trò của 3 thành phần:
+# MODULE 1: KIỂM SOÁT TRUY CẬP MẠNG (NAC) & 802.1X
 
-1.  **Supplicant (Client/AR):** Máy tính/Điện thoại muốn vào mạng.
-2.  **Authenticator (NAS/Switch/AP):** "Bảo vệ gác cổng".
-    - Chế độ hoạt động: **Pass-through** (Chuyển tiếp). Nó không giải mã mật khẩu, chỉ chuyển gói tin từ Client sang Server.
-3.  **Authentication Server (AS):** "Bộ não". Thường là RADIUS Server. Quyết định cho vào hay không.
+### 1. Bảng so sánh các phương pháp thực thi NAC (Enforcement Methods)
 
-**3. Giao thức (Cần phân biệt rõ):**
+_Dùng để trả lời câu hỏi: "Phương pháp nào phù hợp nhất cho...?"_
 
-- **IEEE 802.1X:** Là tiêu chuẩn chung (Luật chơi).
-- **EAP (Extensible Authentication Protocol):** Là cái **Phong bì/Khung**. Chứa phương thức xác thực bên trong (Vân tay, Thẻ từ, Password...).
-- **EAPOL (EAP over LAN):** Là xe vận chuyển EAP chạy giữa **Client và Switch**.
-- **RADIUS:** Là xe vận chuyển EAP chạy giữa **Switch và Server**.
+| Phương pháp     | Đặc điểm cốt lõi                                                        | Ưu điểm                                                        | Nhược điểm                                                        | Khi nào dùng?                                                               |
+| :-------------- | :---------------------------------------------------------------------- | :------------------------------------------------------------- | :---------------------------------------------------------------- | :-------------------------------------------------------------------------- |
+| **IEEE 802.1X** | Chặn ngay tại cổng vật lý (Switch/AP) hoặc cổng ảo (Wifi). Sử dụng EAP. | **Bảo mật cao nhất**. Xác thực mạnh, mã hóa đường truyền.      | Cấu hình phức tạp. Cần thiết bị hỗ trợ (Switch xịn).              | Mạng doanh nghiệp cần bảo mật cao, Wi-Fi Enterprise (WPA2/3-Enterprise).    |
+| **VLANs**       | Cô lập thiết bị vào các mạng LAN ảo dựa trên vai trò.                   | Phân tách lưu lượng tốt (Khách không nhìn thấy Server nội bộ). | Không ngăn được thiết bị cắm vào mạng (chỉ đổi mạng cho nó thôi). | Dùng để phân loại: Mạng Khách (Guest), Mạng IoT, Mạng Cách ly (Quarantine). |
+| **Firewall**    | Lọc gói tin dựa trên IP, Port, Ứng dụng.                                | Kiểm soát chi tiết truy cập đến Server cụ thể.                 | Khó quản lý với người dùng di động (IP thay đổi liên tục).        | Dùng kết hợp để giới hạn quyền truy cập sâu vào Server sau khi đã vào mạng. |
+| **DHCP**        | Quản lý cấp phát IP (Cấp IP "rác" hoặc không cấp Gateway).              | Dễ triển khai, không cần thay đổi hạ tầng nhiều.               | **Dễ bị qua mặt** (User tự đặt IP tĩnh). Bảo mật yếu.             | Dùng cho mạng đơn giản hoặc làm lớp bảo vệ phụ trợ.                         |
 
-**4. Cơ chế Cổng (Logic Port):**
+### 2. Chi tiết về Kiến trúc IEEE 802.1X
 
-- **Uncontrolled Port (Cổng không kiểm soát):** Luôn mở, nhưng chỉ cho phép duy nhất gói tin EAPOL đi qua để xin phép.
-- **Controlled Port (Cổng kiểm soát):** Mặc định ĐÓNG (Blocked). Chỉ mở khi Server báo "OK". Lúc này dữ liệu (Web, Mail) mới được đi qua.
+_Dùng để trả lời câu hỏi về thành phần và vai trò._
 
----
+| Thành phần        | Tên gọi khác      | Chức năng chính                                                               | Ví dụ thực tế                             |
+| :---------------- | :---------------- | :---------------------------------------------------------------------------- | :---------------------------------------- |
+| **Supplicant**    | Client, AR, Peer  | Thiết bị **xin** vào mạng. Chạy phần mềm Agent hoặc dùng OS có sẵn.           | Laptop, Smartphone, Camera IP.            |
+| **Authenticator** | NAS, Switch, AP   | **Người gác cổng**. Chuyển tiếp (Pass-through) gói tin EAP. Đóng/Mở cổng.     | Cisco Switch, Aruba Access Point.         |
+| **Auth Server**   | Policy Server, AS | **Bộ não**. Kiểm tra User/Pass, Certificate. Quyết định cho phép hay từ chối. | RADIUS Server (Microsoft NPS, Cisco ISE). |
 
-### PHẦN 2: BẢO MẬT ĐIỆN TOÁN ĐÁM MÂY (CLOUD)
+### 3. Cơ chế hoạt động của Cổng (Port Logic) trong 802.1X
 
-**1. Công thức NIST "5 - 3 - 4" (Bắt buộc thuộc):**
+_Cực kỳ quan trọng cho các câu hỏi "True/False" hoặc quy trình._
 
-- **5 Đặc điểm:** Tự phục vụ (On-demand), Truy cập rộng rãi, Gom tài nguyên, Co giãn nhanh (Elasticity), Đo đếm dịch vụ.
-- **3 Mô hình dịch vụ (Ai quản lý cái gì? - Cực quan trọng):**
-  - **IaaS (Hạ tầng):** Provider lo phần cứng. Bạn lo OS, App, Data. (Ví dụ: Thuê VPS).
-  - **PaaS (Nền tảng):** Provider lo phần cứng + OS + DB. Bạn chỉ lo Code/Data. (Ví dụ: Google App Engine).
-  - **SaaS (Phần mềm):** Provider lo tất cả (A-Z). Bạn chỉ dùng. (Ví dụ: Gmail, Google Docs).
-- **4 Mô hình triển khai:** Public, Private, Community, Hybrid.
+- **Trạng thái mặc định:** Cổng ở trạng thái **Unauthorized** (Chưa xác thực).
+- **Mô hình cổng kép (Dual-port model):** Một cổng vật lý được tách thành 2 kênh logic:
+  1.  **Uncontrolled Port (Cổng không kiểm soát):**
+      - _Đặc điểm:_ Luôn mở (Open).
+      - _Chức năng:_ **CHỈ** cho phép gói tin **EAPOL** đi qua.
+      - _Mục đích:_ Để Client có thể "hét" lên server xin xác thực.
+  2.  **Controlled Port (Cổng kiểm soát):**
+      - _Đặc điểm:_ Mặc định đóng (Blocked).
+      - _Chức năng:_ Cho phép dữ liệu người dùng (HTTP, FTP, IP...) đi qua.
+      - _Kích hoạt:_ Chỉ mở khi Server gửi lệnh "Accept".
 
-**2. Các "Diễn viên" trong Cloud:**
+### 4. Giao thức EAP & EAPOL (Đóng gói)
 
-- **Cloud Provider:** Người bán (AWS).
-- **Cloud Consumer:** Người mua (Chúng ta).
-- **Cloud Broker:** **Môi giới** (Giúp kết hợp nhiều cloud, quản lý hộ, tìm giá rẻ).
-- **Cloud Auditor:** **Kiểm toán** (Bên thứ 3 độc lập kiểm tra cam kết bảo mật).
+_Dùng để trả lời câu hỏi về cấu trúc gói tin._
 
-**3. Rủi ro lớn nhất - Multi-tenancy (Đa thuê bao):**
-
-- **Khái niệm:** Nhiều khách hàng khác nhau dùng chung một phần cứng vật lý.
-- **Nguy cơ:** Tấn công kênh bên (Side-channel attack), thoát ly máy ảo (VM Escape).
-- **Giải pháp DB:**
-  - _Multi-instance:_ Mỗi người 1 nhà riêng (An toàn, Đắt).
-  - _Multi-tenant:_ Ở chung phòng (Share DB), phân biệt bằng nhãn dán (Tagging) -> Rẻ, Rủi ro lộ dữ liệu cao hơn.
-
-**4. Vấn đề Mã hóa dữ liệu:**
-
-- Nếu mã hóa toàn bộ DB trước khi đẩy lên Cloud -> Cloud bị mù, **không tìm kiếm (Search/Query)** được.
-- **Giải pháp:** Dùng kiến trúc **Proxy/Middleman** ở giữa để mã hóa câu lệnh truy vấn và giải mã kết quả trả về.
-
----
-
-### TỪ KHÓA ĐỂ LÀM TRẮC NGHIỆM:
-
-- Thấy **"Health Check"** hoặc **"Posture"** $\rightarrow$ chọn **NAC**.
-- Thấy **"Port-based"** $\rightarrow$ chọn **802.1X**.
-- Thấy **"Pass-through"** $\rightarrow$ chọn vai trò của **Authenticator (Switch)**.
-- Thấy **"Elasticity"** (Co giãn) $\rightarrow$ chọn đặc điểm **Cloud**.
-- Thấy **"Runtime/Middleware/OS management by Provider"** $\rightarrow$ chọn **PaaS**.
-- Thấy **"Side-channel attack"** hoặc **"Shared resources"** $\rightarrow$ chọn rủi ro **Multi-tenancy**.
-  Chào bạn, dưới đây là **lời giải chi tiết** cho bài tập Chương V: Kiểm soát truy cập mạng & Bảo mật điện toán đám mây trong hình ảnh bạn cung cấp.
-
-Đáp án này được xây dựng dựa trên kiến thức chuẩn của môn học và nội dung các slide bài giảng mà bạn đã gửi trước đó.
+- **EAP (Extensible Authentication Protocol):** Là khung (framework). Hỗ trợ nhiều phương thức (MD5, TLS, SmartCard...).
+  - _Đặc tính:_ Lock-step (Hỏi 1 câu - Đáp 1 câu -> Chậm, không dùng tải dữ liệu).
+- **EAPOL (EAP over LAN):**
+  - _Nơi chạy:_ Giữa **Client** <---> **Switch**.
+  - _Các loại gói tin (Packet Types):_
+    - `EAP-Packet` (0): Chứa dữ liệu xác thực.
+    - `EAPOL-Start` (1): Client chủ động xin bắt đầu (khi vừa cắm dây).
+    - `EAPOL-Logoff` (2): Client xin thoát -> Switch đóng cổng ngay.
+    - `EAPOL-Key` (3): Trao đổi khóa mã hóa.
+- **RADIUS:**
+  - _Nơi chạy:_ Giữa **Switch** <---> **Server**.
+  - _Tại sao dùng?_ Vì EAPOL không chạy qua Router được, phải bọc vào RADIUS (IP/UDP) để đi xa.
 
 ---
 
-### **PHẦN I: CÂU HỎI TỰ LUẬN**
+# MODULE 2: ĐIỆN TOÁN ĐÁM MÂY (CLOUD COMPUTING)
 
-**Câu 1: Cho biết các thành phần của hệ thống kiểm soát truy cập mạng (NAC)**
-Dựa trên kiến trúc NAC, có 3 thành phần chính:
+### 1. Bảng phân chia trách nhiệm (Service Models)
 
-1.  **Access Requester (AR) / Supplicant:** Là thiết bị của người dùng (như Laptop, PC, Smartphone...) đang cố gắng truy cập vào mạng. Còn được gọi là _EAP Peer_.
-2.  **Policy Server (Máy chủ chính sách):** Là "bộ não" của hệ thống. Nó xác định quyền truy cập nào sẽ được cấp cho AR. Nó thường dựa vào các hệ thống phụ trợ để kiểm tra danh tính và "sức khỏe" thiết bị trước khi ra quyết định.
-3.  **Network Access Server (NAS) / Authenticator:** Là điểm kiểm soát truy cập (thường là Switch hoặc Wifi Access Point). Nó đóng vai trò như "người gác cổng", chặn kết nối của AR cho đến khi nhận được lệnh cho phép từ Policy Server.
+_Dùng để trả lời câu hỏi: "Ai quản lý cái gì?", "Mô hình nào phù hợp cho...?"_
 
-**Câu 2: Liệt kê các phương pháp thực thi quyền truy cập mạng phổ biến**
-Các phương pháp để hệ thống NAC áp dụng (thực thi) luật lên thiết bị:
+| Mô hình  | Tên gọi  | Bạn (Khách hàng) quản lý                               | Provider (Nhà cung cấp) quản lý             | Ví dụ điển hình                                   | Khi nào dùng?                                                            |
+| :------- | :------- | :----------------------------------------------------- | :------------------------------------------ | :------------------------------------------------ | :----------------------------------------------------------------------- |
+| **IaaS** | Hạ tầng  | **Hệ điều hành (OS)**, Middleware, Runtime, Data, App. | Phần cứng (Server, Storage), Mạng, Ảo hóa.  | VPS, AWS EC2, Google Compute Engine.              | Cần cài phần mềm đặc thù, cần kiểm soát sâu hệ điều hành.                |
+| **PaaS** | Nền tảng | **Dữ liệu (Data), Ứng dụng (App)**.                    | OS, Runtime, Middleware + Hạ tầng bên dưới. | Google App Engine, Heroku, AWS Elastic Beanstalk. | Dev muốn tập trung viết code, không muốn lo cài Win/Linux hay vá lỗi OS. |
+| **SaaS** | Phần mềm | **Không gì cả** (chỉ cấu hình User/Policy).            | **Tất cả (A-Z)**.                           | Gmail, Dropbox, Office 365, Salesforce.           | Người dùng cuối, doanh nghiệp cần phần mềm dùng ngay (email, CRM).       |
 
-1.  **IEEE 802.1X:** Kiểm soát dựa trên cổng (mạnh nhất và phổ biến nhất).
-2.  **VLANs (Virtual LANs):** Cô lập thiết bị vào các mạng ảo khác nhau (ví dụ: VLAN khách, VLAN nhân viên).
-3.  **Firewall (Tường lửa):** Chặn lọc gói tin.
-4.  **DHCP Management:** Quản lý việc cấp phát IP (ví dụ: không cấp Gateway cho thiết bị lạ).
+### 2. So sánh 4 mô hình triển khai (Deployment Models)
 
-**Câu 3: Cho biết các thành phần điện toán đám mây**
-Theo mô hình tham chiếu của NIST, có 5 thành phần (diễn viên) chính:
+| Mô hình             | Đặc điểm                                                                             | Ưu điểm                                                              | Nhược điểm                                              |
+| :------------------ | :----------------------------------------------------------------------------------- | :------------------------------------------------------------------- | :------------------------------------------------------ |
+| **Public Cloud**    | Hạ tầng dùng chung cho toàn xã hội (đa thuê bao).                                    | Rẻ nhất, Co giãn (Elasticity) tốt nhất.                              | Bảo mật thấp hơn, ít quyền kiểm soát vị trí dữ liệu.    |
+| **Private Cloud**   | Hạ tầng dành riêng cho 1 tổ chức duy nhất.                                           | Bảo mật cao nhất, kiểm soát tuyệt đối.                               | Đắt nhất (tự mua/thuê server riêng), khó co giãn nhanh. |
+| **Community Cloud** | Dùng chung cho một nhóm tổ chức có cùng mối quan tâm (VD: Các ngân hàng, Chính phủ). | Chia sẻ chi phí, tuân thủ quy định ngành chung.                      | Vẫn tốn kém hơn Public.                                 |
+| **Hybrid Cloud**    | Kết hợp 2 loại trên (Thường là Public + Private).                                    | **Linh hoạt nhất**: Dữ liệu mật để Private, Web công cộng để Public. | Phức tạp nhất để quản lý và kết nối.                    |
 
-1.  **Cloud Consumer (Người tiêu dùng):** Người/tổ chức sử dụng dịch vụ.
-2.  **Cloud Provider (Nhà cung cấp - CP):** Đơn vị cung cấp dịch vụ (AWS, Google, Azure...).
-3.  **Cloud Auditor (Kiểm toán viên):** Bên thứ 3 độc lập đánh giá, kiểm tra tính bảo mật và tuân thủ của CP.
-4.  **Cloud Broker (Môi giới):** Bên trung gian giúp quản lý, tích hợp hoặc tối ưu hóa việc sử dụng nhiều dịch vụ đám mây.
-5.  **Cloud Carrier (Nhà vận chuyển):** Đơn vị cung cấp đường truyền mạng kết nối Consumer và Provider (nhà mạng ISP).
+### 3. Các Actors (Diễn viên) đặc biệt
 
-**Câu 4: Mô tả kiến trúc tham chiếu điện toán đám mây của NIST**
-Kiến trúc tham chiếu NIST (NIST SP 500-292) là một công cụ mô hình hóa để mô tả, thảo luận và phát triển hệ thống đám mây. Đặc điểm chính:
+_Cẩn thận nhầm lẫn giữa Broker và Carrier._
 
-- Nó tập trung vào **"Cái gì"** (What) - các dịch vụ và vai trò, chứ không phải **"Làm thế nào"** (How) - giải pháp kỹ thuật cụ thể.
-- Nó xác định rõ vai trò và trách nhiệm của 5 tác nhân chính (Consumer, Provider, Auditor, Broker, Carrier).
-- Nó bao gồm các mô hình dịch vụ (SaaS, PaaS, IaaS) và mô hình triển khai (Public, Private, Hybrid, Community).
+- **Cloud Broker (Nhà môi giới):**
+  - _Vai trò:_ Trung gian, tư vấn, gộp dịch vụ.
+  - _Chức năng:_ Tích hợp (Service Intermediation), Gộp (Aggregation), Kinh doanh chênh lệch giá (Arbitrage).
+  - _Từ khóa:_ "Quản lý phức tạp", "Nhiều cloud", "Tối ưu chi phí".
+- **Cloud Carrier (Nhà vận chuyển):**
+  - _Vai trò:_ Cung cấp dây cáp, đường truyền.
+  - _Từ khóa:_ "ISP", "Viettel/VNPT", "Kết nối mạng", "Vận chuyển".
+    **3\. Rủi ro lớn nhất - Shared Technology Issues (Vấn đề công nghệ chia sẻ / Multi-tenancy):**
 
-**Câu 5: Cho biết danh mục dịch vụ SecaaS (Cloud Security as a Service)**
-Theo Liên minh bảo mật đám mây (Cloud Security Alliance), các dịch vụ SecaaS bao gồm:
-
-1.  Quản lý danh tính và quyền truy cập (IAM).
-2.  Ngăn ngừa mất dữ liệu (DLP).
-3.  Bảo mật Web (Web Security).
-4.  Bảo mật Email (Email Security).
-5.  Đánh giá an ninh (Security Assessments).
-6.  Quản lý xâm nhập (Intrusion Management).
-7.  Bảo mật thông tin và quản lý sự kiện (SIEM).
-8.  Mã hóa (Encryption).
-9.  Kinh doanh liên tục và khắc phục thảm họa (BCDR).
-10. An ninh mạng (Network Security).
+* **Khái niệm:** Các thành phần phần cứng/phần mềm nền tảng (CPU, GPU, **Hypervisor**) được dùng chung.
+* **Nguy cơ:** Kẻ tấn công nằm cùng máy chủ vật lý có thể khai thác lỗ hổng của **Hypervisor** để tấn công máy ảo khác (**VM Escape**) hoặc nghe lén (**Side-channel attack**).
 
 ---
 
-### **PHẦN II: CÂU HỎI TRẮC NGHIỆM**
+# MODULE 3: BẢO MẬT ĐÁM MÂY (CLOUD SECURITY)
 
-**Câu 1:** **c. NAC**
+### 1. So sánh mô hình Cơ sở dữ liệu (Database Deployment)
 
-- **Giải thích:** NAC (Network Access Control) là thuật ngữ chung chỉ việc quản lý kiểm soát ai được vào mạng và làm gì trong đó.
-- _(NAS là thiết bị phần cứng, ARC/RAS là thuật ngữ khác)._
+_Đây là phần khó và hay bẫy về bảo vệ dữ liệu._
 
-**Câu 2:** **b. Máy chủ chính sách**
+| Đặc điểm          | **Multi-instance (Đa phiên bản)**                 | **Multi-tenant (Đa thuê bao)**                     |
+| :---------------- | :------------------------------------------------ | :------------------------------------------------- |
+| **Cấu trúc**      | Mỗi khách hàng có 1 máy ảo/DBMS riêng biệt.       | Nhiều khách hàng dùng chung 1 DBMS/Ứng dụng.       |
+| **Cách ly**       | Cách ly vật lý/ảo hóa mạnh.                       | Cách ly logic bằng **Tagging (Gắn thẻ)** ID.       |
+| **Độ an toàn**    | **Cao**. Hacker khó nhảy từ khách A sang khách B. | **Thấp hơn**. Rủi ro lỗi phần mềm lộ dữ liệu chéo. |
+| **Chi phí**       | Đắt (Tốn tài nguyên).                             | Rẻ (Tối ưu tài nguyên).                            |
+| **Khi nào dùng?** | Dữ liệu nhạy cảm, Ngân hàng, Y tế.                | Ứng dụng phổ thông, Startup cần rẻ.                |
 
-- **Giải thích:** Trong mô hình NAC, **Policy Server** (Máy chủ chính sách) là nơi chứa các quy tắc và đưa ra quyết định cuối cùng về việc cấp quyền (Authorization).
-- _(Máy chủ xác thực chỉ trả lời câu hỏi "Bạn là ai", còn quyền hạn do Policy Server quyết định)._
+### 2. Chiến lược Mã hóa & Tìm kiếm trên Cloud
 
-**Câu 3:** **a. EAP peer**
+_Vấn đề:_ Mã hóa xong thì Cloud không hiểu -> Không tìm kiếm (Search) được.
 
-- **Giải thích:** Trong giao thức EAP/802.1X, máy khách (Client/Supplicant) được gọi kỹ thuật là **EAP peer** (đối tác ngang hàng trong giao thức EAP).
+- **Giải pháp 1: Tải về hết (Tồi)**
+  - _Cách làm:_ Tải toàn bộ DB về -> Giải mã -> Tìm.
+  - _Đánh giá:_ Không khả thi với dữ liệu lớn.
+- **Giải pháp 2: Kiến trúc Proxy (Tốt)**
+  - _Cách làm:_ Dùng **Query Processor** (tại Client).
+  - _Quy trình:_
+    1.  Client gửi SQL: `SELECT * FROM User WHERE Name='Dat'`
+    2.  Proxy mã hóa lệnh: `SELECT * FROM Encry_Tab WHERE Encry_Col='Xy7#b'`
+    3.  Cloud tìm chính xác chuỗi `Xy7#b` và trả về.
+    4.  Proxy giải mã kết quả cho Client.
+  - _Ưu điểm:_ Cloud không bao giờ thấy dữ liệu gốc, vẫn tìm kiếm được.
 
-**Câu 4:** **d. DHCP**
+### 3. SecaaS (Security as a Service)
 
-- **Giải thích:** DHCP (Dynamic Host Configuration Protocol) là giao thức tự động cấp phát địa chỉ IP. VLAN là mạng ảo, 802.1X là xác thực, EAP là giao thức đóng gói xác thực.
+- **Khái niệm:** Thuê dịch vụ bảo mật thay vì tự làm.
+- **Các dịch vụ chính:**
+  - **IAM:** Quản lý User/Pass.
+  - **DLP (Data Loss Prevention):** Chặn gửi tài liệu mật ra ngoài.
+  - **SIEM:** Phân tích Log/Sự kiện bảo mật.
+  - **BCDR:** Khôi phục sau thảm họa (Backup).
 
-**Câu 5:** **c. IaaS**
+---
 
-- **Giải thích:**
-  - **IaaS (Infrastructure as a Service):** Cung cấp hạ tầng (máy ảo, ổ cứng...). Khách hàng tự cài và quản lý Hệ điều hành (OS).
-  - _PaaS:_ Nhà cung cấp quản lý OS.
-  - _SaaS:_ Nhà cung cấp quản lý cả Ứng dụng.
+# MODULE 4: "THẦN CHÚ" TRA CỨU NHANH (KEYWORD MAPPING)
 
-**Câu 6:** **True (Đúng)**
+_Gặp từ khóa này trong đề thi -> Nghĩ ngay đến đáp án tương ứng._
 
-- **Giải thích:** Đây chính là định nghĩa đầy đủ của NAC: Xác thực (Authentication), xác định dữ liệu/quyền hạn (Authorization) và kiểm soát hành động (Health check/Compliance).
-
-**Câu 7:** **True (Đúng)**
-
-- **Giải thích:** Đây là tính chất **Rapid Elasticity** (Khả năng co giãn nhanh) - một trong 5 đặc điểm cốt lõi của điện toán đám mây theo NIST.
-
-**Câu 8:** **False (Sai)**
-
-- **Giải thích:** Theo lý thuyết (Slide 40), mối đe dọa xâm phạm dữ liệu **gia tăng** (tăng lên) trên đám mây do môi trường chia sẻ (multi-tenancy), mất quyền kiểm soát vật lý và bề mặt tấn công rộng hơn qua Internet.
-
-**Câu 9:** **True (Đúng)**
-
-- **Giải thích:** Đây là vai trò chính của **Cloud Broker** (Nhà môi giới). Họ giúp tổng hợp, tích hợp và đơn giản hóa việc quản lý khi khách hàng dùng nhiều dịch vụ đám mây phức tạp.
-
-**Câu 10:** **True (Đúng)**
-
-- **Giải thích:** Khi dùng Cloud (đặc biệt là Public Cloud), khách hàng bắt buộc phải nhường quyền kiểm soát vật lý, hạ tầng mạng lõi, và các lớp ảo hóa (tùy mô hình IaaS/PaaS/SaaS) cho nhà cung cấp (Cloud Provider). Khách hàng không thể tự mình bảo vệ server vật lý đặt tại data center của Google hay AWS được.
+1.  **"Health Check" / "Posture" / "Compliance"** $\rightarrow$ **NAC**.
+2.  **"Pass-through"** $\rightarrow$ Chế độ của **Switch/Authenticator**.
+3.  **"Port-based"** $\rightarrow$ **IEEE 802.1X**.
+4.  **"EAPOL-Start"** $\rightarrow$ Client **chủ động** muốn xác thực.
+5.  **"Elasticity" (Co giãn)** $\rightarrow$ Đặc điểm **Cloud** (Tự tăng/giảm).
+6.  **"Runtime" / "Middleware" / "OS" do Provider quản lý** $\rightarrow$ **PaaS**.
+7.  **"Consumer quản lý OS"** $\rightarrow$ **IaaS**.
+8.  **"Side-channel attack" / "VM Escape"** $\rightarrow$ Rủi ro của **Multi-tenancy**.
+9.  **"Tagging"** $\rightarrow$ Cơ chế bảo vệ của **Multi-tenant**.
+10. **"Arbitrage" (Chênh lệch giá) / "Aggregation"** $\rightarrow$ Vai trò của **Cloud Broker**.

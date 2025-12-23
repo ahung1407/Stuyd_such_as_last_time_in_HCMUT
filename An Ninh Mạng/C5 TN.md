@@ -1,81 +1,211 @@
-Chào bạn, đây là bộ câu hỏi trắc nghiệm chuyên sâu để ôn tập Chương 5 (Kiểm soát truy cập mạng và Bảo mật điện toán đám mây) dựa trên tài liệu "C5.pdf", bao gồm các dạng câu hỏi bạn yêu cầu.
+Chào bạn, để "master" hoàn toàn chương này, bạn không cần làm hàng trăm câu hỏi lặp lại, mà cần khoảng **25-30 câu hỏi chất lượng cao** bao phủ đủ các khía cạnh: Định nghĩa, Cơ chế hoạt động, So sánh và Các tình huống thực tế.
 
-### Dạng 1: Hiểu & Áp dụng
+Dưới đây là bộ **25 câu hỏi tuyển chọn** được thiết kế theo các dạng bạn yêu cầu (Hiểu, Tổng hợp, Tìm lỗi sai, Bẫy từ ngữ) để quét sạch mọi góc khuất của Slide bài giảng.
 
-**1. Trong kiến trúc Kiểm soát truy cập mạng (NAC), thành phần nào đóng vai trò là điểm kiểm soát truy cập cho người dùng từ xa kết nối vào mạng doanh nghiệp, còn được gọi là cổng đa phương tiện?**
+---
+
+### PHẦN 1: KIỂM SOÁT TRUY CẬP MẠNG (NAC) & 802.1X
+
+**1. Trong kiến trúc NAC, thành phần nào chịu trách nhiệm thực thi trực tiếp việc chặn hoặc cho phép gói tin tại điểm kết nối mạng?**
 A. Access Requester (AR)
 B. Policy Server
 C. Network Access Server (NAS)
-D. Cloud Broker
+D. Antivirus Agent
 đáp án: C
-Giải thích: C đúng vì tài liệu mô tả NAS hoạt động như một điểm kiểm soát truy cập cho người dùng ở các địa điểm từ xa và còn được gọi là cổng đa phương tiện hoặc máy chủ truy cập từ xa; A sai vì AR là thiết bị khách (node) đang cố truy cập mạng; B sai vì Policy Server xác định quyền truy cập dựa trên chính sách chứ không phải là điểm kết nối vật lý/logic trực tiếp; D sai vì Cloud Broker là thuật ngữ của điện toán đám mây.
+Giải thích: C đúng vì NAS (như Switch, Wireless AP) hoạt động như một cổng kiểm soát/người gác cổng để thực thi quyết định; A sai vì AR là thiết bị muốn truy cập; B sai vì Policy Server chỉ ra quyết định chứ không trực tiếp chặn tại cổng vật lý; D sai vì đây chỉ là phần mềm trên máy khách.
 
-**2. Một công ty muốn kết hợp nhiều dịch vụ đám mây từ các nhà cung cấp khác nhau để tạo thành một dịch vụ mới tối ưu hơn cho người dùng. Theo kiến trúc tham chiếu NIST, vai trò nào sẽ thực hiện chức năng "Tổng hợp dịch vụ" này?**
+**2. Giao thức EAP (Extensible Authentication Protocol) được mô tả tốt nhất là gì?**
+A. Một thuật toán mã hóa khóa công khai để bảo vệ mật khẩu.
+B. Một phương thức xác thực cụ thể dựa trên mật khẩu một lần (OTP).
+C. Một khung (framework) vận chuyển hỗ trợ nhiều phương thức xác thực khác nhau.
+D. Một giao thức định tuyến giúp tìm đường đi ngắn nhất đến máy chủ xác thực.
+đáp án: C
+Giải thích: C đúng vì EAP là một giao thức "phong bì" (container) có thể chứa nhiều loại xác thực bên trong (TLS, Smartcard, Password...); A sai vì EAP không phải là thuật toán mã hóa; B sai vì OTP chỉ là một phương thức có thể nằm trong EAP; D sai vì EAP hoạt động ở lớp liên kết dữ liệu/xác thực, không phải định tuyến.
+
+**3. Trong mô hình IEEE 802.1X, khi trạng thái xác thực chưa thành công (Unauthorized), "Cổng không được kiểm soát" (Uncontrolled Port) cho phép loại dữ liệu nào đi qua?**
+A. Không cho phép bất kỳ dữ liệu nào.
+B. Chỉ cho phép các gói tin EAPOL.
+C. Cho phép lưu lượng DHCP và DNS để máy khách lấy IP.
+D. Cho phép truy cập vào VLAN khách (Guest VLAN).
+đáp án: B
+Giải thích: B đúng vì theo chuẩn 802.1X, cổng không kiểm soát luôn mở nhưng chỉ lọc và cho phép duy nhất giao thức EAPOL để thực hiện xác thực; A sai vì nó không chặn EAPOL; C và D sai vì DHCP/DNS hay dữ liệu vào VLAN khách đều bị chặn hoặc điều hướng bởi cổng kiểm soát (Controlled Port) hoặc cơ chế khác sau khi xác thực thất bại.
+
+**4. Thiết bị chuyển mạch (Switch) đóng vai trò là Authenticator trong 802.1X hoạt động ở chế độ "Pass-through" nghĩa là gì?**
+A. Nó tự động giải mã thông tin đăng nhập của người dùng để kiểm tra.
+B. Nó chuyển tiếp các gói EAP từ Supplicant đến Authentication Server mà không đọc nội dung xác thực bên trong.
+C. Nó cho phép mọi lưu lượng đi qua mà không cần xác thực (Pass-through mode).
+D. Nó chuyển đổi giao thức từ IPv4 sang IPv6.
+đáp án: B
+Giải thích: B đúng vì Authenticator chỉ đóng gói lại gói EAP từ EAPOL sang RADIUS (và ngược lại) chứ không can thiệp vào quy trình mã hóa/xác thực bên trong; A sai vì Switch thường không đủ khả năng hoặc thẩm quyền giải mã; C sai vì đây là hiểu nhầm về từ "Pass-through" trong ngữ cảnh bảo mật; D sai vì không liên quan đến chức năng này.
+
+**5. (Dạng bẫy từ ngữ) Giao thức nào được sử dụng để đóng gói EAP nhằm vận chuyển giữa Authenticator (Switch) và Authentication Server (AS)?**
+A. EAPOL (EAP over LAN)
+B. IEEE 802.11
+C. RADIUS
+D. TCP/IP thuần túy
+đáp án: C
+Giải thích: C đúng vì đoạn từ Switch đến Server thường đi qua mạng IP nên dùng RADIUS để bọc gói EAP; A sai vì EAPOL chỉ dùng cho đoạn từ Client đến Switch (Layer 2); B sai vì đây là chuẩn Wifi; D sai vì TCP/IP là giao thức nền, cần một giao thức ứng dụng như RADIUS để định dạng gói tin xác thực.
+
+**6. Một trong những chức năng quan trọng của NAC hiện đại là "Health Check" (Kiểm tra sức khỏe). Điều này đề cập đến việc gì?**
+A. Kiểm tra tốc độ đường truyền mạng có ổn định không.
+B. Kiểm tra xem người dùng có bị ốm (sốt/ho) qua webcam không.
+C. Đánh giá sự tuân thủ của thiết bị (bản vá OS, Antivirus) trước khi cho vào mạng.
+D. Kiểm tra nhiệt độ CPU của máy chủ Policy Server.
+đáp án: C
+Giải thích: C đúng vì Health Check/Posture Assessment nhằm đảm bảo thiết bị không mang rủi ro bảo mật (như virus, lỗ hổng chưa vá) vào mạng; A, B, D sai vì hiểu sai ngữ cảnh từ "Health" trong NAC.
+
+**7. (Tìm điểm sai) Đâu KHÔNG phải là một phương pháp thực thi (Enforcement method) phổ biến của NAC được liệt kê trong tài liệu?**
+A. IEEE 802.1X
+B. VLANs
+C. BGP Routing
+D. DHCP Management
+đáp án: C
+Giải thích: C đúng vì BGP là giao thức định tuyến liên mạng (WAN), không dùng để kiểm soát truy cập người dùng cuối trong LAN; A, B, D sai vì chúng đều là các phương pháp thực thi tiêu chuẩn của NAC (chặn cổng, cô lập VLAN, cấp IP hạn chế).
+
+**8. Loại gói tin EAPOL nào được Supplicant gửi đi để chủ động bắt đầu quá trình xác thực khi vừa kết nối cáp?**
+A. EAPOL-Key
+B. EAPOL-Logoff
+C. EAPOL-Start
+D. EAP-Response/Identity
+đáp án: C
+Giải thích: C đúng vì EAPOL-Start là tín hiệu máy khách gửi để đánh thức Switch bắt đầu quy trình; A sai vì dùng trao đổi khóa; B sai vì dùng để đăng xuất; D sai vì đây là gói trả lời sau khi Switch đã hỏi.
+
+---
+
+### PHẦN 2: BẢO MẬT ĐIỆN TOÁN ĐÁM MÂY (CLOUD SECURITY)
+
+**9. (Dạng tổng hợp) Theo NIST SP-800-145, đặc điểm nào cho phép tài nguyên điện toán được phân bổ và gán lại linh hoạt cho nhiều người tiêu dùng khác nhau theo mô hình "multi-tenant"?**
+A. On-demand self-service (Tự phục vụ theo nhu cầu)
+B. Resource Pooling (Gom nhóm tài nguyên)
+C. Measured Service (Dịch vụ được đo lường)
+D. Broad network access (Truy cập mạng rộng rãi)
+đáp án: B
+Giải thích: B đúng vì Resource Pooling mô tả việc nhà cung cấp gom tài nguyên vật lý lại để phục vụ nhiều khách hàng cùng lúc (multi-tenant); A sai vì nói về khả năng tự thao tác; C sai vì nói về tính cước phí; D sai vì nói về khả năng truy cập đa nền tảng.
+
+**10. Trong mô hình dịch vụ PaaS (Platform as a Service), trách nhiệm bảo mật nào thuộc về Khách hàng (Consumer)?**
+A. Bảo mật vật lý của trung tâm dữ liệu.
+B. Cập nhật bản vá cho Hệ điều hành (OS).
+C. Bảo mật Ứng dụng và Dữ liệu do họ phát triển.
+D. Thay thế ổ cứng hỏng của máy chủ.
+đáp án: C
+Giải thích: C đúng vì trong PaaS, nhà cung cấp lo phần cứng và nền tảng (OS, Runtime), khách hàng chỉ quản lý Ứng dụng và Dữ liệu của mình; A, B, D sai vì đó là trách nhiệm của nhà cung cấp Cloud (CP) trong mô hình PaaS.
+
+**11. (Dạng hiểu & áp dụng) Một công ty muốn chuyển lên mây nhưng lo ngại việc tự quản lý nhiều nhà cung cấp (AWS, Azure) cùng lúc quá phức tạp. Thành phần nào trong kiến trúc NIST hỗ trợ giải quyết vấn đề này?**
 A. Cloud Carrier
 B. Cloud Auditor
 C. Cloud Broker
 D. Cloud Provider
 đáp án: C
-Giải thích: C đúng vì tài liệu định nghĩa Cloud Broker cung cấp dịch vụ tổng hợp (aggregation), kết hợp nhiều dịch vụ đám mây để đáp ứng nhu cầu người dùng; A sai vì Cloud Carrier chỉ cung cấp kết nối và vận chuyển; B sai vì Cloud Auditor là bên kiểm toán độc lập; D sai vì Cloud Provider là người cung cấp dịch vụ gốc.
+Giải thích: C đúng vì Cloud Broker đóng vai trò trung gian, giúp tổng hợp (aggregation), kinh doanh chênh lệch giá (arbitrage) và làm trung gian dịch vụ để đơn giản hóa việc quản lý cho khách hàng; A sai vì Carrier chỉ cung cấp đường truyền; B sai vì Auditor chỉ kiểm toán; D sai vì Provider là người bán dịch vụ gốc.
 
-**3. Trong chuẩn IEEE 802.1X, trạng thái của "cổng không được kiểm soát" (uncontrolled port) cho phép loại dữ liệu nào đi qua dù thiết bị chưa được xác thực?**
-A. Tất cả dữ liệu TCP/IP.
-B. Chỉ các gói tin ARP.
-C. Các đơn vị dữ liệu giao thức (PDU) giữa thiết bị đầu cuối và máy chủ xác thực (AS).
-D. Không cho phép bất kỳ dữ liệu nào đi qua.
+**12. Rủi ro bảo mật "Shared technology issues" trong đám mây chủ yếu liên quan đến vấn đề gì?**
+A. Hacker tấn công vào đường truyền Internet dùng chung.
+B. Các lỗ hổng trong siêu giám sát (Hypervisor) cho phép tấn công thoát ly máy ảo (VM escape) trong môi trường đa thuê bao.
+C. Việc chia sẻ mật khẩu giữa các nhân viên trong công ty.
+D. Chia sẻ mã nguồn ứng dụng công khai trên GitHub.
+đáp án: B
+Giải thích: B đúng vì đây là rủi ro đặc thù của Multi-tenancy khi nhiều khách hàng dùng chung phần cứng/nền tảng ảo hóa; A sai vì đó là rủi ro mạng chung; C và D sai vì không liên quan đến công nghệ nền tảng của Cloud.
+
+**13. (Bẫy từ ngữ) Sự khác biệt chính giữa "Multi-instance model" và "Multi-tenant model" khi triển khai cơ sở dữ liệu trên Cloud là gì?**
+A. Multi-instance rẻ hơn Multi-tenant.
+B. Multi-instance cung cấp môi trường DBMS riêng biệt (máy ảo riêng) cho mỗi khách hàng, trong khi Multi-tenant chia sẻ chung một môi trường DBMS.
+C. Multi-tenant an toàn hơn Multi-instance.
+D. Multi-tenant không hỗ trợ gắn thẻ (tagging) dữ liệu.
+đáp án: B
+Giải thích: B đúng vì Multi-instance là mỗi người một "nhà" (instance riêng), còn Multi-tenant là ở chung "phòng" (chung instance DB, chỉ khác ID); A sai vì Multi-instance thường đắt hơn do tốn tài nguyên hơn; C sai vì Multi-tenant rủi ro hơn về rò rỉ dữ liệu; D sai vì Multi-tenant dựa hoàn toàn vào tagging để phân biệt dữ liệu.
+
+**14. Để bảo vệ dữ liệu ở trạng thái nghỉ (Data at Rest) trên Cloud mà vẫn đảm bảo Cloud Provider KHÔNG THỂ đọc được dữ liệu, giải pháp tối ưu nhất là gì?**
+A. Sử dụng tường lửa ứng dụng web (WAF).
+B. Mã hóa dữ liệu trước khi tải lên và khách hàng tự giữ khóa giải mã.
+C. Sử dụng giao thức HTTPS khi truyền tải.
+D. Tin tưởng vào cam kết bảo mật trong hợp đồng SLA của Provider.
+đáp án: B
+Giải thích: B đúng vì nếu khách hàng giữ khóa, Provider chỉ lưu trữ các khối dữ liệu vô nghĩa và không thể giải mã; A sai vì WAF bảo vệ tấn công web; C sai vì HTTPS chỉ bảo vệ dữ liệu đang truyền (Data in Transit); D sai vì đây là biện pháp hành chính, không phải kỹ thuật.
+
+**15. Thách thức lớn nhất khi mã hóa toàn bộ cơ sở dữ liệu trước khi đẩy lên đám mây là gì?**
+A. Tốn dung lượng lưu trữ hơn.
+B. Mất khả năng thực hiện các truy vấn tìm kiếm hoặc tính toán trên dữ liệu đó tại Cloud.
+C. Không thể sao lưu (backup) dữ liệu.
+D. Tin tặc dễ dàng tấn công Brute-force hơn.
+đáp án: B
+Giải thích: B đúng vì Cloud Server không hiểu dữ liệu đã mã hóa nên không thể Index, Sort hay Query (SELECT \* WHERE...) được; A sai vì dung lượng không tăng đáng kể; C sai vì vẫn backup file được bình thường; D sai vì mã hóa không làm tăng nguy cơ brute-force.
+
+**16. SecaaS (Security as a Service) được định nghĩa là gì?**
+A. Phần mềm diệt virus miễn phí tích hợp sẵn trong Windows.
+B. Việc cung cấp các dịch vụ bảo mật thông qua đám mây tới cơ sở hạ tầng hoặc hệ thống tại chỗ của khách hàng.
+C. Một chứng chỉ bảo mật dành cho chuyên gia IT.
+D. Quy trình bảo vệ an ninh vật lý cho các tòa nhà chọc trời.
+đáp án: B
+Giải thích: B đúng theo định nghĩa của Cloud Security Alliance; A sai vì đó là phần mềm on-premise; C và D sai hoàn toàn về ngữ cảnh.
+
+**17. Đâu KHÔNG phải là một danh mục dịch vụ của SecaaS theo Liên minh bảo mật đám mây?**
+A. Quản lý danh tính và quyền truy cập (IAM)
+B. Ngăn ngừa mất dữ liệu (DLP)
+C. Quản lý chuỗi cung ứng phần cứng (Hardware Supply Chain Management)
+D. Kinh doanh liên tục và khắc phục thảm họa (BCDR)
 đáp án: C
-Giải thích: C đúng vì tài liệu nêu rõ một cổng không được kiểm soát cho phép trao đổi các PDU giữa thiết bị đầu cuối và AS bất kể trạng thái xác thực, cụ thể là khung EAPOL,; A sai vì dữ liệu mạng thông thường bị chặn; B sai vì ARP không được đề cập là ngoại lệ chính trong ngữ cảnh 802.1X EAPOL; D sai vì nó phải cho phép luồng xác thực đi qua.
+Giải thích: C đúng vì SecaaS tập trung vào dịch vụ phần mềm/giải pháp số qua mạng, không bao gồm việc quản lý vận chuyển phần cứng vật lý; A, B, D đều là các dịch vụ SecaaS tiêu biểu.
 
-### Dạng 2: Tổng hợp & Liên kết
+**18. (Dạng suy luận) Trong kiến trúc Proxy để xử lý dữ liệu mã hóa trên Cloud, vai trò của "Query Processor" tại phía khách hàng là gì?**
+A. Lưu trữ toàn bộ dữ liệu gốc để không cần dùng Cloud.
+B. Chuyển đổi câu truy vấn SQL trên dữ liệu gốc thành câu truy vấn trên dữ liệu đã mã hóa trước khi gửi lên Cloud.
+C. Tăng tốc độ đường truyền Internet.
+D. Đóng vai trò như một máy chủ DNS.
+đáp án: B
+Giải thích: B đúng vì để Cloud hiểu được lệnh tìm kiếm mà không cần giải mã dữ liệu, Query Processor phải "dịch" câu lệnh SQL sang dạng tương thích với dữ liệu mã hóa; A sai vì nếu lưu hết thì không cần Cloud nữa; C và D sai chức năng.
 
-**4. Mối quan hệ giữa EAP, EAPOL và IEEE 802.1X được mô tả chính xác nhất như thế nào?**
-A. IEEE 802.1X sử dụng EAPOL để đóng gói các gói tin EAP truyền tải qua mạng LAN nhằm thực hiện xác thực.
-B. EAP là giao thức thay thế cho IEEE 802.1X trong môi trường không dây.
-C. EAPOL là một phần của RADIUS server dùng để mã hóa dữ liệu EAP.
-D. IEEE 802.1X định nghĩa EAP, còn EAPOL là chuẩn phần cứng cho các cổng mạng.
+**19. Theo khuyến nghị của NIST về bảo vệ dữ liệu (Data protection), các tổ chức cần đánh giá giải pháp của nhà cung cấp Cloud đối với các hoạt động nào của dữ liệu?**
+A. Chỉ quan tâm đến dữ liệu khi đang sử dụng.
+B. Dữ liệu ở trạng thái nghỉ (rest), đang truyền (transit), đang sử dụng (use) và quá trình tiêu hủy (sanitize).
+C. Chỉ quan tâm đến việc sao lưu dữ liệu hàng ngày.
+D. Chỉ quan tâm đến dữ liệu liên quan đến tài chính.
+đáp án: B
+Giải thích: B đúng vì bảo mật toàn diện phải bao phủ trọn vẹn vòng đời của dữ liệu từ lúc tạo ra, lưu trữ, di chuyển đến khi xóa bỏ hoàn toàn; A, C, D sai vì thiếu sót các trạng thái quan trọng khác.
+
+**20. (Liên kết kiến thức) Mối quan hệ giữa 802.1X và EAP là gì?**
+A. 802.1X là phương thức xác thực, EAP là phương thức vận chuyển.
+B. 802.1X xác định cách đóng gói EAP trên mạng LAN (EAPOL) để thực hiện kiểm soát truy cập dựa trên cổng.
+C. EAP thay thế hoàn toàn cho 802.1X trong các mạng hiện đại.
+D. Chúng là hai giao thức cạnh tranh nhau, không thể dùng chung.
+đáp án: B
+Giải thích: B đúng vì 802.1X sử dụng EAP làm "nhân" để xác thực, và 802.1X cung cấp cơ chế "vỏ bọc" (EAPOL) và kiểm soát cổng vật lý; A sai vì ngược lại (EAP là khung vận chuyển/xác thực, 802.1X là cơ chế kiểm soát cổng); C và D sai vì chúng bổ trợ cho nhau.
+
+**21. Trong bối cảnh SecaaS, dịch vụ "SIEM" (Security Information and Event Management) đảm nhận vai trò gì?**
+A. Quản lý việc cấp phát IP động.
+B. Tổng hợp và phân tích nhật ký (log/event) từ nhiều nguồn để phát hiện sự cố bảo mật.
+C. Mã hóa ổ cứng máy chủ.
+D. Chặn thư rác (Spam).
+đáp án: B
+Giải thích: B đúng vì SIEM là hệ thống quản lý thông tin và sự kiện bảo mật, chuyên phân tích log tập trung; A là DHCP; C là Encryption; D là Email Security.
+
+**22. Thuật ngữ "Elasticity" (Tính co giãn) trong Cloud khác gì với "Scalability" (Tính mở rộng) truyền thống?**
+A. Elasticity chỉ khả năng tự động tăng/giảm tài nguyên nhanh chóng theo nhu cầu thực tế (có thể thu nhỏ lại).
+B. Elasticity nghĩa là hệ thống không bao giờ sập.
+C. Scalability là khả năng thu nhỏ tài nguyên, còn Elasticity chỉ là mở rộng.
+D. Hai thuật ngữ này hoàn toàn giống nhau.
 đáp án: A
-Giải thích: A đúng vì tài liệu nói thành phần thiết yếu trong 802.1X là giao thức EAPOL (EAP over LAN), cho phép đóng gói dữ liệu EAP trong các khung Ethernet để thiết bị giao tiếp với bộ xác thực,; B sai vì chúng hoạt động cùng nhau chứ không thay thế; C sai vì EAPOL hoạt động ở lớp liên kết mạng LAN giữa client và switch/AP chứ không phải trên RADIUS; D sai vì EAP là chuẩn riêng (RFC 3748) được 802.1X sử dụng.
+Giải thích: A đúng vì Elasticity nhấn mạnh tính "đàn hồi" (như dây chun) - tự động phình ra khi tải cao và co lại khi tải thấp để tiết kiệm chi phí; Scalability truyền thống thường chỉ nói về khả năng mở rộng lên (Scale up/out) theo kế hoạch dài hạn.
 
-**5. Đối với bảo mật dữ liệu trên đám mây, giải pháp nào được xem là lý tưởng nhất để bảo vệ "dữ liệu ở trạng thái nghỉ" (data at rest) nhằm đảm bảo nhà cung cấp dịch vụ (CP) không thể truy cập được dữ liệu của khách hàng?**
-A. Sử dụng tường lửa mạnh mẽ của nhà cung cấp đám mây.
-B. Khách hàng mã hóa cơ sở dữ liệu và giữ khóa, chỉ lưu trữ dữ liệu đã mã hóa trên đám mây.
-C. Sử dụng giao thức HTTPS/TLS khi truyền tải dữ liệu lên đám mây.
-D. Ký hợp đồng SLA cam kết bảo mật với nhà cung cấp.
+**23. "Cloud Carrier" khác "Cloud Provider" ở điểm nào?**
+A. Carrier cung cấp dịch vụ phần mềm, Provider cung cấp phần cứng.
+B. Carrier là đơn vị trung gian vận chuyển kết nối mạng (ISP), Provider là đơn vị cung cấp dịch vụ đám mây (Computing/Storage).
+C. Carrier là người mua, Provider là người bán.
+D. Carrier kiểm toán hệ thống của Provider.
 đáp án: B
-Giải thích: B đúng vì tài liệu nêu biện pháp bảo mật lý tưởng là khách hàng mã hóa cơ sở dữ liệu và chỉ lưu trữ dữ liệu được mã hóa trên đám mây, CP không có quyền truy cập vào khóa mã hóa,; A sai vì tường lửa chỉ ngăn truy cập mạng trái phép; C sai vì đây là bảo vệ dữ liệu đang truyền (in transit); D sai vì đây là biện pháp hành chính/pháp lý, không phải kỹ thuật ngăn chặn trực tiếp.
+Giải thích: B đúng theo kiến trúc NIST; A sai về bản chất dịch vụ; C sai vì người mua là Consumer; D sai vì người kiểm toán là Auditor.
 
-### Dạng 3: Tìm điểm sai/ngoại lệ
+**24. Biện pháp nào sau đây giúp giảm thiểu rủi ro "Account Hijacking" (Chiếm đoạt tài khoản) trên đám mây?**
+A. Sử dụng xác thực đa yếu tố (MFA) và cấm chia sẻ tài khoản.
+B. Tắt tường lửa.
+C. Sử dụng giao thức HTTP thay vì HTTPS.
+D. Cho phép mọi IP truy cập vào trang quản trị.
+đáp án: A
+Giải thích: A đúng vì MFA làm khó hacker ngay cả khi lộ mật khẩu, và cấm chia sẻ giúp định danh chính xác; B, C, D đều là các hành động làm tăng rủi ro bảo mật.
 
-**6. Đâu KHÔNG phải là một trong các phương pháp thực thi (enforcement methods) phổ biến của Kiểm soát truy cập mạng (NAC) được liệt kê trong tài liệu?**
-A. IEEE 802.1X
-B. Virtual local area networks (VLANs)
-C. Quản lý DHCP (DHCP management)
-D. Xác thực sinh trắc học (Biometric authentication)
-đáp án: D
-Giải thích: D đúng là ngoại lệ vì tài liệu liệt kê 4 phương pháp thực thi NAC phổ biến là IEEE 802.1X, VLANs, Firewall và DHCP management, không đề cập đến sinh trắc học như một phương pháp thực thi mạng; A, B, C đều là các phương pháp đúng được liệt kê trong tài liệu.
-
-**7. Khi nói về Kiến trúc tham chiếu điện toán đám mây của NIST (SP 500-292), nhận định nào sau đây là SAI?**
-A. Nó tập trung vào yêu cầu "những gì" dịch vụ đám mây cung cấp.
-B. Nó đưa ra giải pháp thiết kế chi tiết về "làm thế nào" để triển khai đám mây.
-C. Nó là công cụ để mô tả và phát triển kiến trúc bằng cách dùng khung tham chiếu chung.
-D. Nó không thể hiện kiến trúc hệ thống của một hệ thống cụ thể nào.
+**25. Tại sao giao thức EAP lại được thiết kế theo kiểu "Lock-step" (Bước khóa)?**
+A. Để tăng tốc độ truyền tải dữ liệu lớn.
+B. Để đảm bảo tính trật tự: Phải nhận được phản hồi cho yêu cầu trước đó rồi mới gửi yêu cầu tiếp theo, phù hợp cho xác thực nhưng không phù hợp truyền dữ liệu lớn.
+C. Để mã hóa dữ liệu mạnh hơn.
+D. Để cho phép nhiều người dùng xác thực cùng lúc trên một kênh truyền.
 đáp án: B
-Giải thích: B là nhận định sai vì tài liệu khẳng định kiến trúc tham chiếu NIST tập trung vào "những gì" chứ KHÔNG phải là giải pháp thiết kế và triển khai "làm thế nào"; A, C, D là các nhận định đúng về kiến trúc tham chiếu NIST được trích dẫn trong tài liệu.
-
-### Dạng 4: Bẫy từ ngữ
-
-**8. Trong mô hình hoạt động của 802.1X, vai trò của "Authenticator" (Người xác thực) khác với "Authentication Server" (Máy chủ xác thực) ở điểm nào?**
-A. Authenticator chứa cơ sở dữ liệu người dùng và quyết định việc cấp quyền.
-B. Authenticator chỉ đóng vai trò chuyển tiếp (pass-through), còn Authentication Server mới thực hiện xác thực thực tế.
-C. Authenticator là phần mềm cài trên máy khách, còn Authentication Server là thiết bị mạng.
-D. Authenticator xử lý EAP, còn Authentication Server xử lý EAPOL.
-đáp án: B
-Giải thích: B đúng vì tài liệu mô tả Authenticator hoạt động như "trình xác thực chuyển tiếp", nó chuyển tiếp các gói EAP từ thiết bị ngang hàng tới máy chủ xác thực (như RADIUS), và chỉ khi AS xác thực xong thì Authenticator mới mở cổng dữ liệu,; A sai vì đây là nhiệm vụ của AS; C sai vì phần mềm trên máy khách là Supplicant; D sai vì Authenticator xử lý đóng gói lại từ EAPOL sang RADIUS cho AS.
-
-**9. "SecaaS" được định nghĩa là việc cung cấp các dịch vụ bảo mật. Theo Liên minh bảo mật đám mây (CSA), danh mục nào sau đây nằm trong SecaaS?**
-A. Quản lý hiệu suất mạng (Network Performance Management).
-B. Ngăn ngừa mất dữ liệu (Data Loss Prevention).
-C. Cung cấp hạ tầng phần cứng (IaaS).
-D. Lập trình ứng dụng (Application Development).
-đáp án: B
-Giải thích: B đúng vì "Ngăn ngừa mất dữ liệu" (DLP) là một trong các danh mục dịch vụ SecaaS được liệt kê bởi CSA; A sai vì quản lý hiệu suất thường thuộc về giám sát mạng chứ không phải bảo mật SecaaS; C sai vì IaaS là mô hình dịch vụ đám mây cơ bản, không phải SecaaS; D sai vì đây là hoạt động phát triển phần mềm (PaaS).
+Giải thích: B đúng vì RFC 3748 quy định EAP không hỗ trợ gửi và nhận lộn xộn (out of order), giúp quy trình xác thực chặt chẽ, đơn giản hóa việc xử lý trên thiết bị phần cứng hạn chế (như Switch); A sai vì lock-step làm chậm tốc độ; C sai vì không liên quan mã hóa; D sai.

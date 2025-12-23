@@ -1,154 +1,156 @@
-Chào bạn, để giúp bạn nắm bắt nhanh và nhớ lâu toàn bộ chương "Bảo mật thư điện tử" (Slide 1-48), tôi đã cô đọng lại thành 4 trụ cột kiến thức cốt lõi nhất. Đây là những điểm "chết người" thường xuyên xuất hiện trong các bài thi và ứng dụng thực tế.
+Chào bạn, đây là **Tài liệu tổng hợp "Cheat Sheet" A-Z về Bảo mật thư điện tử**. Tài liệu này được thiết kế tối ưu cho việc **mang vào phòng thi (Open book)**: tra cứu nhanh, bảng so sánh đối chiếu, giải thích các logic quan trọng để trả lời trắc nghiệm và tự luận.
 
 ---
 
-### **1. Nền tảng: Tại sao Email kém an toàn?**
+# TỔNG HỢP KIẾN THỨC BẢO MẬT THƯ ĐIỆN TỬ (CHƯƠNG 8)
 
-- **Bản chất:** Giao thức **SMTP** (RFC 5321) ra đời từ thập niên 80, thiết kế dạng văn bản thuần (text-based), **không có mã hóa**. Nó đi qua nhiều trạm trung chuyển (MTA), ai cũng có thể đọc trộm hoặc sửa đổi.
-- **MIME (Multipurpose Internet Mail Extensions):**
-  - Là "bản vá" giúp email gửi được file đính kèm (ảnh, video, exe) và hỗ trợ đa ngôn ngữ (Tiếng Việt).
-  - Dùng **Base64** (hoặc Quoted-printable) để chuyển dữ liệu nhị phân thành văn bản ASCII an toàn khi gửi qua SMTP.
-  - **Lưu ý:** MIME chỉ giúp định dạng dữ liệu, **không giúp bảo mật**.
+_(Dùng để tra cứu nhanh khi làm bài thi)_
 
 ---
 
-### **2. Cơ chế mật mã: Công thức chung cho bảo mật Email**
+## I. CƠ SỞ HẠ TẦNG EMAIL & MIME
 
-Dù là PGP hay S/MIME, cả hai đều dùng chung một bộ khung thuật toán (Hybrid Encryption):
+### 1. Các thành phần & Giao thức
 
-- **Để giữ BÍ MẬT (Confidentiality):** Dùng **Mã hóa lai**.
-  - Tạo một **Khóa phiên (Session Key - $K_s$)** ngẫu nhiên.
-  - Dùng $K_s$ mã hóa nội dung thư (AES/IDEA/CAST).
-  - Dùng **Khóa công khai người nhận** mã hóa cái $K_s$ đó (RSA).
-- **Để XÁC THỰC & TOÀN VẸN (Auth & Integrity):** Dùng **Chữ ký số**.
-  - Tạo mã băm (Hash) của thư (SHA).
-  - Dùng **Khóa riêng người gửi** mã hóa mã băm đó.
+| Thành phần / Giao thức        | Cổng (Port)  | Chức năng chính                                            | Đặc điểm & Lưu ý thi cử                                       |
+| :---------------------------- | :----------- | :--------------------------------------------------------- | :------------------------------------------------------------ |
+| **MUA** (Mail User Agent)     | N/A          | Ứng dụng gửi/nhận mail phía người dùng (Outlook, Webmail). | Soạn thảo, đọc mail.                                          |
+| **MTA** (Mail Transfer Agent) | 25           | Chuyển tiếp mail giữa các Server.                          | Server-to-Server.                                             |
+| **SMTP** (RFC 5321)           | **25** (gốc) | **ĐẨY (Push)** thư đi.                                     | Chỉ hỗ trợ **ASCII 7-bit**. Không bảo mật mặc định.           |
+| **POP3**                      | **110**      | **KÉO (Pull)** thư về.                                     | Tải về & Xóa trên server (mặc định). Khó dùng nhiều thiết bị. |
+| **IMAP**                      | **143**      | **ĐỒNG BỘ** thư.                                           | Quản lý thư mục trên server. Dùng nhiều thiết bị tốt.         |
 
-> **Quy tắc vàng cần nhớ:**
->
-> - Muốn **giấu tin**: Mã hóa bằng Khóa công khai người nhận.
-> - Muốn **chứng minh danh tính**: Ký bằng Khóa riêng của mình.
+### 2. MIME (Multipurpose Internet Mail Extensions)
 
----
-
-### **3. PGP (Pretty Good Privacy) - "Dân chủ & Cá nhân"**
-
-- **Triết lý:** **Web of Trust** (Mạng lưới niềm tin). Không tin vào một tổ chức trung gian nào (CA), người dùng tự ký xác nhận độ tin cậy cho nhau.
-- **Đặc điểm kỹ thuật:**
-  - **Thứ tự xử lý:** Ký (Signature) $\rightarrow$ Nén (Compression - ZIP) $\rightarrow$ Mã hóa (Encryption).
-  - **Lý do nén trước mã hóa:** Để giảm dư thừa dữ liệu, làm khó thám mã và tiết kiệm dung lượng.
-  - **Quản lý khóa:**
-    - **Key ID:** 64-bit cuối của khóa công khai (để định danh nhanh).
-    - **Private Key Ring:** Chùm khóa riêng được bảo vệ bằng mật khẩu (Pass-phrase).
-  - **Chuyển đổi:** Dùng **Radix-64** để biến đống dữ liệu mã hóa thành text gửi qua email.
+- **Mục đích:** Khắc phục hạn chế của SMTP (chỉ gửi được text ASCII). MIME giúp gửi: Ảnh, Video, File đính kèm, Tiếng Việt (Unicode).
+- **Không phải giao thức bảo mật:** MIME chỉ định dạng dữ liệu, không mã hóa.
+- **Các Header quan trọng:**
+  - `Content-Type`: Báo loại dữ liệu (vd: `image/jpeg`, `multipart/mixed`).
+  - `Content-Transfer-Encoding`: Cách biến đổi sang ASCII an toàn (vd: **Base64**).
 
 ---
 
-### **4. S/MIME (Secure/MIME) - "Tập trung & Doanh nghiệp"**
+## II. PGP (PRETTY GOOD PRIVACY) - CHI TIẾT
 
-- **Triết lý:** **PKI (Public Key Infrastructure)**. Tin tưởng vào tổ chức cấp phát chứng chỉ số tập trung (**CA** - Certificate Authority). Đây là chuẩn tích hợp sẵn trong Outlook, Gmail doanh nghiệp.
-- **Đặc điểm kỹ thuật:**
-  - **Cấu trúc tin:** Dùng chuẩn **CMS** (Cryptographic Message Syntax).
-    - `EnvelopedData`: Chứa nội dung đã mã hóa.
-    - `SignedData`: Chứa nội dung đã ký.
-  - **Thuật toán chuẩn (RFC):** Bắt buộc phải hỗ trợ **AES** (mã hóa) và **SHA-256** (băm).
-  - **Tính năng nâng cao:**
-    - Biên nhận có chữ ký (Signed Receipt - chứng minh đã nhận).
-    - Nhãn bảo mật (Security Label - phân quyền truy cập).
+### 1. Đặc điểm cốt lõi
 
----
+- **Tác giả:** Phil Zimmermann.
+- **Mô hình tin cậy:** **Web of Trust** (Mạng lưới niềm tin). Cá nhân tự ký xác nhận khóa cho nhau, không phụ thuộc tổ chức CA tập trung.
+- **Đối tượng:** Cá nhân, tự do, phi tập trung.
 
-### **Bảng so sánh (Cực quan trọng để đi thi)**
+### 2. Năm (05) Dịch vụ của PGP (Cực quan trọng)
 
-| Tiêu chí            | PGP (Pretty Good Privacy)                          | S/MIME (Secure/MIME)                                |
-| :------------------ | :------------------------------------------------- | :-------------------------------------------------- |
-| **Mô hình tin cậy** | **Phi tập trung** (Web of Trust - Bạn bè tin nhau) | **Tập trung** (PKI / CA - Tin vào tổ chức cấp phép) |
-| **Đối tượng dùng**  | Cá nhân, người dùng am hiểu kỹ thuật               | Doanh nghiệp, tổ chức chính phủ                     |
-| **Định dạng**       | PGP Message / Radix-64                             | MIME CMS (EnvelopedData, SignedData)                |
-| **Thuật toán gốc**  | IDEA, CAST, RSA                                    | AES, 3DES, RSA                                      |
-| **Quy trình**       | Ký -> Nén -> Mã hóa                                | Xử lý linh hoạt lồng nhau (Nested)                  |
+1.  **Xác thực (Authentication):** Dùng Chữ ký số (RSA/DSS + SHA).
+2.  **Bí mật (Confidentiality):** Mã hóa lai (Symmetric + Asymmetric).
+3.  **Nén (Compression):** Dùng thuật toán ZIP.
+4.  **Tương thích Email (Email Compatibility):** Dùng **Radix-64** (biến Binary thành ASCII).
+5.  **Phân mảnh (Segmentation):** Chia nhỏ thư quá lớn.
 
-### **Gợi ý cách học thuộc:**
+### 3. Quy trình xử lý dữ liệu (Thứ tự "vàng")
 
-1.  Nhớ sơ đồ **Ký -> Nén -> Mã hóa** của PGP.
-2.  Nhớ **Web of Trust** là của PGP, **CA** là của S/MIME.
-3.  Nhớ **Session Key** dùng một lần là để mã hóa dữ liệu, còn **RSA** là để bảo vệ Session Key đó.
-    Chào bạn, dưới đây là lời giải chi tiết cho **CÂU HỎI VÀ BÀI TẬP CHƯƠNG VIII (Bảo mật thư điện tử)** dựa trên kiến thức về Mật mã và An ninh mạng (đặc biệt là nội dung PGP và S/MIME).
+> **Quy tắc:** KÝ $\rightarrow$ NÉN $\rightarrow$ MÃ HÓA $\rightarrow$ RADIX-64
 
----
+| Bước                    | Hành động                                                                            | Tại sao làm lúc này? (Lý giải trắc nghiệm)                                                                                     |
+| :---------------------- | :----------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------- |
+| **1. Ký (Sign)**        | Tạo Hash $\rightarrow$ Mã hóa Hash bằng **Khóa riêng người gửi**.                    | Ký vào bản gốc để đảm bảo toàn vẹn. Nếu ký sau nén, giải nén khác nhau sẽ sai chữ ký.                                          |
+| **2. Nén (Zip)**        | Nén cả (Thư + Chữ ký).                                                               | **Nén trước mã hóa** để giảm dư thừa, tăng độ khó thám mã, tiết kiệm dung lượng. (Mã hóa xong dữ liệu ngẫu nhiên rất khó nén). |
+| **3. Mã hóa (Encrypt)** | Mã hóa bằng **Khóa phiên ($K_s$)**. Mã hóa $K_s$ bằng **Khóa công khai người nhận**. | Bảo vệ bí mật toàn bộ gói tin.                                                                                                 |
+| **4. Radix-64**         | Chuyển đổi sang ký tự in được.                                                       | Để đi qua được các SMTP Server cũ (chỉ hiểu ASCII).                                                                            |
 
-### **PHẦN I. CÂU HỎI TỰ LUẬN**
+### 4. Quản lý Khóa trong PGP
 
-**Câu 1: Các dịch vụ được PGP cung cấp là gì?**
-PGP (Pretty Good Privacy) cung cấp 5 dịch vụ cơ bản sau:
-
-1.  **Xác thực (Authentication):** Sử dụng chữ ký số (tạo bằng RSA/SHA) để xác nhận người gửi và đảm bảo tính toàn vẹn của thông điệp.
-2.  **Bí mật (Confidentiality):** Mã hóa thông điệp bằng khóa phiên (Session key - thuật toán đối xứng như CAST-128, IDEA, 3DES, AES) và mã hóa khóa phiên đó bằng khóa công khai của người nhận (RSA).
-3.  **Nén (Compression):** Nén dữ liệu (thường dùng thuật toán ZIP) để tiết kiệm băng thông và tăng độ bảo mật (giảm dư thừa dữ liệu trước khi mã hóa).
-4.  **Tương thích E-mail (E-mail compatibility):** Sử dụng thuật toán Radix-64 để chuyển đổi dữ liệu nhị phân (binary) đã mã hóa thành dạng văn bản ASCII (text) để có thể gửi qua các hệ thống email truyền thống.
-5.  **Phân mảnh (Segmentation):** Tự động chia nhỏ các thông điệp có kích thước quá lớn để gửi đi và ghép lại ở phía người nhận.
-
-**Câu 2: Vì sao PGP tạo chữ ký trước khi thực hiện nén dữ liệu?**
-Có 2 lý do chính:
-
-1.  **Để lưu trữ tiện lợi:** Người nhận sau khi giải mã và giải nén có thể lưu trữ thông điệp ở dạng văn bản rõ (plaintext) cùng với chữ ký số. Nếu chữ ký được tạo trên dữ liệu đã nén, người dùng phải lưu trữ cả bản nén (vô nghĩa với con người) để xác thực lại sau này.
-2.  **Tính nhất quán (Quan trọng nhất):** Các thuật toán nén không phải lúc nào cũng "tất định" (deterministic). Các phiên bản phần mềm nén khác nhau có thể tạo ra chuỗi bit nén khác nhau cho cùng một nội dung. Nếu ký vào bản nén, khi người nhận nén lại để kiểm tra có thể ra kết quả sai lệch $\rightarrow$ Chữ ký sai. Ký vào bản rõ đảm bảo chữ ký luôn đúng bất kể dùng phần mềm nén nào.
-
-**Câu 3: Cho biết thuật toán Radix-64 làm gì?**
-
-- **Mục đích:** Chuyển đổi dữ liệu nhị phân (binary) tùy ý (ví dụ: dữ liệu đã mã hóa, chữ ký số) thành các ký tự ASCII in được để truyền an toàn qua các hệ thống email cũ (vốn chỉ hỗ trợ văn bản 7-bit và dễ làm hỏng dữ liệu nhị phân).
-- **Cơ chế:** Radix-64 nhóm 3 byte dữ liệu đầu vào (24 bits) thành 4 nhóm 6-bit. Mỗi nhóm 6-bit được ánh xạ sang một ký tự trong bảng mã Radix-64 (gồm A-Z, a-z, 0-9, +, /). PGP cũng thêm mã kiểm lỗi CRC vào cuối để phát hiện lỗi đường truyền.
-
-**Câu 4: RFC 822 là gì?**
-
-- **RFC 822** ("Standard for the Format of ARPA Internet Text Messages") là tiêu chuẩn cũ định nghĩa định dạng của tin nhắn văn bản trên Internet (tiền thân của email hiện đại).
-- Nó quy định cấu trúc thư gồm 2 phần: **Header** (Tiêu đề: From, To, Subject, Date...) và **Body** (Nội dung), cách nhau bằng một dòng trống.
-- Hiện nay nó đã được thay thế/cập nhật bởi **RFC 5322**.
-
-**Câu 5: S/MIME là gì?**
-
-- **S/MIME (Secure/Multipurpose Internet Mail Extensions)** là một tiêu chuẩn bảo mật cho định dạng email MIME.
-- Khác với PGP (dựa trên Web of Trust), S/MIME dựa trên cơ sở hạ tầng khóa công khai tập trung (**PKI**) và chứng chỉ số X.509 do các tổ chức CA cấp phát.
-- S/MIME cung cấp các dịch vụ tương tự PGP (xác thực, bí mật, toàn vẹn, chống thoái thác) và được tích hợp sẵn trong hầu hết các trình quản lý mail doanh nghiệp như Outlook, Thunderbird.
+- **Khóa phiên ($K_s$ - Session Key):**
+  - Sinh ngẫu nhiên dùng **1 lần**.
+  - Độ dài: 128-bit (CAST/IDEA) hoặc 168-bit (3DES).
+- **Key ID (Định danh khóa):**
+  - Là **64-bit thấp nhất** (đuôi) của Khóa công khai.
+  - Mục đích: Để biết dùng khóa nào giải mã mà không cần gửi cả khóa dài.
+- **Lưu trữ khóa (Key Rings):**
+  - _Public Key Ring:_ Chứa khóa công khai của người khác.
+  - _Private Key Ring:_ Chứa khóa riêng của mình. Được bảo vệ (mã hóa) bằng **Pass-phrase** (Mật khẩu).
 
 ---
 
-### **PHẦN II. CÂU HỎI TRẮC NGHIỆM**
+## III. S/MIME (SECURE/MIME) - CHI TIẾT
 
-**Câu 1: Chọn phát biểu sai trong các phát biểu sau khi PGP được sử dụng trong một hệ thống E-mail:**
+### 1. Đặc điểm cốt lõi
 
-- **Đáp án: c** (Nếu chỉ dùng dịch vụ xác thực thì thông điệp gởi đi sẽ không có mã hóa ở bất kỳ khối dữ liệu nào.)
-- **Giải thích:**
-  - Câu a đúng: PGP cung cấp đủ 5 dịch vụ này.
-  - Câu b đúng: Khi dùng dịch vụ bí mật, nội dung thư được mã hóa.
-  - Câu d đúng: Radix-64 map 3 byte (24 bit) $\rightarrow$ 4 ký tự ASCII (6 bit/ký tự).
-  - **Câu c sai vì:** Dù chỉ dùng dịch vụ xác thực (không mã hóa nội dung thư), PGP vẫn thực hiện **mã hóa bản băm (hash)** bằng khóa riêng của người gửi để tạo ra chữ ký số. Do đó, nói "không có mã hóa ở _bất kỳ_ khối dữ liệu nào" là không chính xác về mặt kỹ thuật mật mã.
+- **Chuẩn:** Tích hợp trong Outlook, Mail doanh nghiệp.
+- **Mô hình tin cậy:** **PKI (Public Key Infrastructure)** tập trung. Dựa vào **CA** (Certificate Authority - như Verisign, Comodo) để cấp chứng chỉ X.509.
+- **Đối tượng:** Doanh nghiệp, Chính phủ, Tổ chức cần quản lý chặt.
 
-**Câu 2: Khi cần truyền một thông điệp và dùng cả hai dịch vụ bí mật và xác thực của PGP thì phần nào sẽ được mã hóa đối xứng bằng khóa phiên?**
+### 2. Cấu trúc tin nhắn (CMS - Cryptographic Message Syntax)
 
-- **Đáp án: d** (Thông điệp và chữ ký số trên thông điệp.)
-- **Giải thích:** Quy trình của PGP là:
-  1.  Tạo chữ ký số (Ký vào thông điệp).
-  2.  Gộp [Thông điệp + Chữ ký số].
-  3.  Nén khối dữ liệu trên.
-  4.  Mã hóa khối dữ liệu nén bằng **khóa phiên** (Symmetric Key).
-      $\rightarrow$ Vậy khóa phiên mã hóa cả thông điệp và chữ ký.
+S/MIME dùng các "hộp" chứa dữ liệu gọi là CMS (RFC 5652):
 
-**Câu 3: Khóa được sử dụng để mã hóa khóa phiên trong PGP khi dùng trên hệ thống E-mail là:**
+- **Data:** Nội dung thư gốc.
+- **SignedData:** Thư đã được ký + Chứng chỉ số X.509.
+- **EnvelopedData:** Thư đã được mã hóa (Bí mật).
+- **CompressedData:** Thư đã nén.
 
-- **Đáp án: c** (Khóa công khai của người nhận.)
-- **Giải thích:** Để đảm bảo chỉ người nhận mới đọc được thư, khóa phiên (dùng để giải mã thư) phải được bảo vệ sao cho chỉ người nhận mở được. Do đó, ta dùng khóa công khai của người nhận để mã hóa khóa phiên này (Cơ chế phong bì số - Digital Envelope).
+### 3. Thuật toán (Theo RFC quy định)
 
-**Câu 4: Chế độ hoạt động của PGP khi thực hiện mã hóa đối xứng là:**
+- **Hàm băm (Hash):** PHẢI hỗ trợ **SHA-256**. (MD5 chỉ để tương thích ngược).
+- **Mã hóa dữ liệu:** PHẢI hỗ trợ **AES-128 CBC**.
+- **Chữ ký/Trao đổi khóa:** RSA.
 
-- **Đáp án: c** (CFB)
-- **Giải thích:** PGP sử dụng chế độ **CFB (Cipher Feedback)**, cụ thể là một biến thể gọi là OpenPGP CFB mode. S/MIME mới thường dùng CBC (Cipher Block Chaining). ECB (Electronic Codebook) không an toàn và không dùng cho dữ liệu lớn.
+### 4. Tính năng nâng cao (Chỉ S/MIME mới có)
 
-**Câu 5: Thuật toán mã hóa nào sau đây là phù hợp với mã hóa đối xứng của PGP:**
+- **Biên nhận có chữ ký (Signed Receipt):** Chứng minh "Tôi đã nhận thư" (Non-repudiation of receipt).
+- **Nhãn bảo mật (Security Labels):** Phân quyền (vd: "Secret", "Top Secret").
+- **Mailing Lists (MLA):** Server trung gian xử lý mã hóa cho danh sách gửi nhiều người.
 
-- **Đáp án: d** (Cả câu (b) và (c) đều đúng)
-- **Giải thích:**
-  - Các chuẩn PGP ban đầu (như RFC 1991) dùng IDEA.
-  - Chuẩn OpenPGP (RFC 4880) yêu cầu hỗ trợ **3DES** (Triple DES) và **AES** (Advanced Encryption Standard). CAST-128 cũng thường được hỗ trợ.
-  - DES (câu a) đã quá cũ và không còn an toàn, không được khuyến nghị trong các phiên bản PGP hiện đại.
-  - Vậy 3DES và AES là các lựa chọn phù hợp và đúng chuẩn.
+---
+
+## IV. BẢNG SO SÁNH ĐỐI CHIẾU (PGP vs S/MIME)
+
+_Dùng để trả lời câu hỏi "Cái nào tốt hơn?", "Sự khác biệt là gì?"_
+
+| Tiêu chí              | **PGP (Pretty Good Privacy)**                                           | **S/MIME (Secure/MIME)**                                                |
+| :-------------------- | :---------------------------------------------------------------------- | :---------------------------------------------------------------------- |
+| **Mô hình tin cậy**   | **Web of Trust** (Mạng lưới cá nhân). Không có trung tâm.               | **PKI / X.509 Certificates**. Có tổ chức CA xác thực tập trung.         |
+| **Quản lý khóa**      | Người dùng tự quản lý Key Ring.                                         | Dựa vào CA và Chứng chỉ số.                                             |
+| **Định dạng dữ liệu** | PGP Message / Radix-64                                                  | MIME CMS (EnvelopedData, SignedData)                                    |
+| **Thuật toán gốc**    | IDEA, CAST-128, RSA, SHA-1                                              | AES, 3DES, RSA, SHA-256                                                 |
+| **Mã hóa khóa riêng** | Bằng **Pass-phrase** người dùng tự đặt.                                 | Thường lưu trong Smartcard/Token hoặc OS KeyStore.                      |
+| **Ưu điểm**           | Độc lập, miễn phí, không sợ bị chính phủ/CA kiểm soát. Tốt cho cá nhân. | Tích hợp sẵn trong Outlook/Webmail. Dễ quản lý quy mô lớn. Tốt cho Cty. |
+| **Nhược điểm**        | Khó dùng với người không rành công nghệ. Phải tự trao đổi khóa.         | Phải mua chứng chỉ từ CA. Phụ thuộc vào hạ tầng PKI.                    |
+
+---
+
+## V. CÁC "CÔNG THỨC" MẬT MÃ CẦN NHỚ
+
+_Áp dụng cho cả PGP và S/MIME_
+
+1.  **Muốn BÍ MẬT (Chỉ người nhận đọc được):**
+
+    - Công thức: $E(K_{Public\_Receiver}, \text{SessionKey})$ + $E(\text{SessionKey}, \text{Message})$
+    - _Dùng khóa công khai người nhận._
+
+2.  **Muốn XÁC THỰC (Chứng minh tôi gửi):**
+
+    - Công thức: $E(K_{Private\_Sender}, \text{Hash(Message)})$
+    - _Dùng khóa riêng người gửi._
+
+3.  **Muốn CẢ HAI (Ký rồi Mã hóa):**
+    - Người gửi: Ký bằng $K_{Private\_Sender}$ $\rightarrow$ Mã hóa bằng $K_{Public\_Receiver}$.
+    - Người nhận: Giải mã bằng $K_{Private\_Receiver}$ $\rightarrow$ Kiểm tra ký bằng $K_{Public\_Sender}$.
+
+---
+
+## VI. TRA CỨU NHANH TRẮC NGHIỆM (KEYWORD)
+
+- **SMTP Port:** 25 (Push).
+- **POP3 Port:** 110 (Pull/Delete).
+- **IMAP Port:** 143 (Sync).
+- **RFC 822:** Chuẩn format mail cũ.
+- **RFC 5322:** Chuẩn format mail mới (hiện tại).
+- **RFC 5321:** Chuẩn giao thức SMTP hiện tại.
+- **Base64 / Radix-64:** Biến 3 bytes (24 bit) $\rightarrow$ 4 ký tự ASCII (6 bit/char). Tăng kích thước file lên khoảng 33%.
+- **Session Key PGP:** Sinh ngẫu nhiên từ di chuột/gõ phím (ANSI X12.17).
+- **Key ID PGP:** 64 bit đuôi.
+- **Pass-phrase:** Bảo vệ Private Key.
+- **EnvelopedData:** Từ khóa cho "Mã hóa" trong S/MIME.
+- **SignedData:** Từ khóa cho "Xác thực" trong S/MIME.
+- **SHA-256 & AES:** Thuật toán bắt buộc của S/MIME.
+- **ZIP:** Thuật toán nén mặc định của PGP.
